@@ -1,0 +1,43 @@
+{
+	"name" : "pluf/supertenant",
+	"description" : "Tenant management module",
+	"type" : "library",
+	"license" : "MIT",
+	"authors" : [{
+			"name" : "Mostafa Barmshory",
+			"email" : "mostafa.barmshory@dpq.co.ir",
+			"homepage" : "http://dpq.co.ir",
+			"role" : "developer"
+		}, {
+			"name" : "Mohammad Hadi Mansouri",
+			"email" : "mohammad.hadi.mansouri@dpq.co.ir",
+			"homepage" : "http://dpq.co.ir",
+			"role" : "developer"
+		}
+	],
+	"minimum-stability" : "stable",
+	"require" : {
+		"pluf/core" : "^2.0.2"
+	},
+	"require-dev" : {
+		"pluf/test" : "^2.1.0",
+		"pluf/user" : "^2.1.0"
+	},
+	"include-path" : [
+		"src/"
+	],
+	"homepage" : "https://github.com/pluf/cache",
+	"support" : {
+		"email" : "info@pluf.ir",
+		"issues" : "https://github.com/pluf/cms/issues",
+		"forum" : "https://github.com/pluf/cms",
+		"wiki" : "https://github.com/pluf/cms/wiki",
+		"source" : "https://github.com/pluf/cms"
+	},
+	"keywords" : [
+		"pluf",
+		"php",
+		"cache",
+		"pluf-module"
+	]
+}
