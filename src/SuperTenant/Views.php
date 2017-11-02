@@ -27,4 +27,40 @@
  */
 class SuperTenant_Views
 {
+
+    /**
+     * Get a tenant
+     *
+     * @param Pluf_HTTP_Request $request
+     * @param array $match
+     */
+    public function get($request, $match)
+    {}
+
+    /**
+     * Create a new tenant
+     *
+     * @param Pluf_HTTP_Request $request
+     * @param array $match
+     */
+    public function create($request, $match)
+    {}
+
+    /**
+     * Delete a tenant
+     *
+     * @param Pluf_HTTP_Request $request
+     * @param array $match
+     */
+    public function delete($request, $match)
+    {}
+
+    /**
+     * Update a tenant
+     *
+     * @param Pluf_HTTP_Request $request
+     * @param array $match
+     */
+    public function update($request, $match)
+    {}
 }

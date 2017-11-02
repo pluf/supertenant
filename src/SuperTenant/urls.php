@@ -17,34 +17,55 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 return array(
-    array( // Content urls
+    array( // Tenant urls
         'regex' => '#^/new$#',
-        'model' => 'CMS_Views',
+        'model' => 'SuperTenant_Views',
         'method' => 'create',
         'http-method' => 'POST',
         'precond' => array(
-            'Pluf_Precondition::ownerRequired'
+            'Pluf_Precondition::loginRequired'
         )
     ),
     array(
         'regex' => '#^/find$#',
-        'model' => 'CMS_Views',
-        'method' => 'find',
-        'http-method' => 'GET'
+        'model' => 'Pluf_Views',
+        'method' => 'findObject',
+        'http-method' => 'GET',
+        'params' => array(
+            'model' => 'Tenant_tenant',
+            'listFilters' => array(
+                'title',
+                'description'
+            ),
+            'listDisplay' => array(
+                'title' => 'title',
+                'description' => 'description'
+            ),
+            'searchFields' => array(
+                'title',
+                'description'
+            ),
+            'sortFields' => array(
+                'title',
+                'description',
+                'creation_date',
+                'modif_dtime'
+            )
+        )
     ),
     array(
         'regex' => '#^/(?P<id>\d+)$#',
-        'model' => 'CMS_Views',
+        'model' => 'SuperTenant_Views',
         'method' => 'get',
         'http-method' => 'GET'
     ),
     array(
         'regex' => '#^/(?P<id>\d+)$#',
-        'model' => 'CMS_Views',
+        'model' => 'SuperTenant_Views',
         'method' => 'delete',
         'http-method' => 'DELETE',
         'precond' => array(
-            'Pluf_Precondition::ownerRequired'
+            'Pluf_Precondition::staffRequired'
         )
     ),
     array(
@@ -53,39 +74,10 @@ return array(
         'method' => 'update',
         'http-method' => 'POST',
         'precond' => array(
-            'Pluf_Precondition::ownerRequired'
+            'Pluf_Precondition::staffRequired'
         )
     ),
+    // TODO: Payment 
+    // TODO: Ticket
     
-    // Download
-    array(
-        'regex' => '#^/(?P<id>\d+)/download$#',
-        'model' => 'CMS_Views',
-        'method' => 'download',
-        'http-method' => 'GET',
-        // Cache apram
-        'cacheable' => true,
-        'revalidate' => true,
-        'intermediate_cache' => true,
-        'max_age' => 25000
-    ),
-    array(
-        'regex' => '#^/(?P<id>\d+)/download$#',
-        'model' => 'CMS_Views',
-        'method' => 'updateFile',
-        'http-method' => 'POST',
-        'precond' => array(
-            'Pluf_Precondition::memberRequired'
-        )
-    ),
-        
-    /*
-     * Named content
-     */        
-    array(
-        'regex' => '#^/(?P<name>.+)$#',
-        'model' => 'CMS_Views',
-        'method' => 'get',
-        'http-method' => 'GET'
-    )
 );
