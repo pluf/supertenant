@@ -2,6 +2,7 @@
 <phpunit colors="true">
 	<testsuites>
 		<testsuite name="Pluf">
+			<directory>./SuperTenant/</directory>
 		</testsuite>
 	</testsuites>
 
