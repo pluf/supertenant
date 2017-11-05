@@ -17,7 +17,7 @@
 	],
 	"minimum-stability" : "stable",
 	"require" : {
-		"pluf/core" : "^2.0.2",
+		"pluf/core" : "^2.1.0",
 		"pluf/tenant" : "^2.1.0"
 	},
 	"require-dev" : {
