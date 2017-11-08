@@ -24,6 +24,9 @@ return array(
         'http-method' => 'POST',
         'precond' => array(
             'Pluf_Precondition::loginRequired'
+        ),
+        'params' => array(
+            'model' => 'Pluf_Tenant'
         )
     ),
     array(
@@ -32,7 +35,7 @@ return array(
         'method' => 'findObject',
         'http-method' => 'GET',
         'params' => array(
-            'model' => 'Tenant_tenant',
+            'model' => 'Pluf_Tenant',
             'listFilters' => array(
                 'title',
                 'description'
@@ -54,30 +57,44 @@ return array(
         )
     ),
     array(
-        'regex' => '#^/(?P<id>\d+)$#',
-        'model' => 'SuperTenant_Views',
-        'method' => 'get',
-        'http-method' => 'GET'
+        'regex' => '#^/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'getObject',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'model' => 'Pluf_Tenant'
+        )
     ),
     array(
-        'regex' => '#^/(?P<id>\d+)$#',
-        'model' => 'SuperTenant_Views',
-        'method' => 'delete',
+        'regex' => '#^/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'deleteObject',
         'http-method' => 'DELETE',
         'precond' => array(
             'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'model' => 'Pluf_Tenant'
         )
     ),
     array(
-        'regex' => '#^/(?P<id>\d+)$#',
-        'model' => 'CMS_Views',
-        'method' => 'update',
+        'regex' => '#^/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'updateObject',
         'http-method' => 'POST',
         'precond' => array(
             'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'model' => 'Pluf_Tenant'
         )
-    ),
-    // TODO: Payment 
+    )
+    // TODO: Payment
     // TODO: Ticket
-    
 );
+    
+    
+    
