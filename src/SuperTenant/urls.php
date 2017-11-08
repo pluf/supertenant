@@ -91,9 +91,101 @@ return array(
         'params' => array(
             'model' => 'Pluf_Tenant'
         )
-    )
-    // TODO: Payment
-    // TODO: Ticket
+    ),
+    /*
+     * Ticket
+     */
+    array(
+        'regex' => '#^/(?P<parentId>\d+)/ticket/find$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Ticket',
+            'listFilters' => array(
+                'status',
+                'type',
+                'requester'
+            ),
+            'listDisplay' => array(),
+            'searchFields' => array(
+                'subject',
+                'description'
+            ),
+            'sortFields' => array(
+                'id',
+                'status',
+                'type',
+                'modif_dtime',
+                'creation_dtime'
+            ),
+            'sortOrder' => array(
+                'id',
+                'DESC'
+            )
+        )
+    ),
+    array(
+        'regex' => '#^/(?P<parentId>\d+)/ticket/new$#',
+        'model' => 'Pluf_Views',
+        'method' => 'createManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'Tenant_Ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/(?P<parentId>\d+)/ticket/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'getManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'Tenant_Ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/(?P<parentId>\d+)/ticket/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'updateManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'Tenant_Ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/(?P<parentId>\d+)/ticket/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'deleteManyToOne',
+        'http-method' => 'DELETE',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'Tenant_Ticket'
+        )
+    ),
 );
     
     

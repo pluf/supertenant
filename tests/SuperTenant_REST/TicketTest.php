@@ -16,254 +16,261 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-// use PHPUnit\Framework\TestCase;
-// require_once 'Pluf.php';
+use PHPUnit\Framework\TestCase;
+require_once 'Pluf.php';
 
-// /**
-//  * @backupGlobals disabled
-//  * @backupStaticAttributes disabled
-//  */
-// class Tenant_REST_TicketsTest extends TestCase
-// {
+/**
+ * @backupGlobals disabled
+ * @backupStaticAttributes disabled
+ */
+class Tenant_REST_TicketsTest extends TestCase
+{
 
-//     /**
-//      * @beforeClass
-//      */
-//     public static function installApps()
-//     {
-//         Pluf::start(dirname(__FILE__) . '/../conf/config-01.php');
-//         $m = new Pluf_Migration(array(
-//             'Pluf',
-//             'Tenant'
-//         ));
-//         $m->install();
-//         // Test user
-//         $user = new Pluf_User();
-//         $user->login = 'test';
-//         $user->first_name = 'test';
-//         $user->last_name = 'test';
-//         $user->email = 'toto@example.com';
-//         $user->setPassword('test');
-//         $user->active = true;
-//         $user->administrator = true;
-//         if (true !== $user->create()) {
-//             throw new Exception();
-//         }
+    /**
+     * @beforeClass
+     */
+    public static function installApps()
+    {
+        Pluf::start(dirname(__FILE__) . '/../conf/config.rest.php');
+        $m = new Pluf_Migration(array(
+            'Pluf',
+            'Tenant',
+            'SuperTenant'
+        ));
+        $m->install();
+        // Test user
+        $user = new Pluf_User();
+        $user->login = 'test';
+        $user->first_name = 'test';
+        $user->last_name = 'test';
+        $user->email = 'toto@example.com';
+        $user->setPassword('test');
+        $user->active = true;
+        $user->administrator = true;
+        if (true !== $user->create()) {
+            throw new Exception();
+        }
         
-//         // Test tenant
-//         $tenant = new Pluf_Tenant();
-//         $tenant->domain = 'localhost';
-//         $tenant->subdomain = 'test';
-//         $tenant->validate = true;
-//         if (true !== $tenant->create()) {
-//             throw new Pluf_Exception('Faile to create new tenant');
-//         }
+        // Test tenant
+        $tenant = new Pluf_Tenant();
+        $tenant->domain = 'localhost';
+        $tenant->subdomain = 'test';
+        $tenant->validate = true;
+        if (true !== $tenant->create()) {
+            throw new Pluf_Exception('Faile to create new tenant');
+        }
         
-//         $client = new Test_Client(array());
-//         $GLOBALS['_PX_request']->tenant = $tenant;
+        $client = new Test_Client(array());
+        $GLOBALS['_PX_request']->tenant = $tenant;
         
-//         $per = new Pluf_RowPermission();
-//         $per->version = 1;
-//         $per->model_id = $tenant->id;
-//         $per->model_class = 'Pluf_Tenant';
-//         $per->owner_id = $user->id;
-//         $per->owner_class = 'Pluf_User';
-//         $per->create();
-//     }
+        $per = new Pluf_RowPermission();
+        $per->version = 1;
+        $per->model_id = $tenant->id;
+        $per->model_class = 'Pluf_Tenant';
+        $per->owner_id = $user->id;
+        $per->owner_class = 'Pluf_User';
+        $per->create();
+    }
 
-//     /**
-//      * @afterClass
-//      */
-//     public static function uninstallApps()
-//     {
-//         $m = new Pluf_Migration(array(
-//             'Pluf',
-//             'Tenant'
-//         ));
-//         $m->unInstall();
-//     }
+    /**
+     * @afterClass
+     */
+    public static function uninstallApps()
+    {
+        $m = new Pluf_Migration(array(
+            'Pluf',
+            'Tenant',
+            'SuperTenant'
+        ));
+        $m->unInstall();
+    }
 
-//     /**
-//      * Getting tenant tickets
-//      *
-//      * Call tenant to get list of tickets
-//      *
-//      * @test
-//      */
-//     public function testFindTikcets()
-//     {
-//         $client = new Test_Client(array(
-//             array(
-//                 'app' => 'Tenant',
-//                 'regex' => '#^/api/tenant#',
-//                 'base' => '',
-//                 'sub' => include 'Tenant/urls.php'
-//             ),
-//             array(
-//                 'app' => 'User',
-//                 'regex' => '#^/api/user#',
-//                 'base' => '',
-//                 'sub' => include 'User/urls.php'
-//             )
-//         ));
-//         // login
-//         $response = $client->post('/api/user/login', array(
-//             'login' => 'test',
-//             'password' => 'test'
-//         ));
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
+    /**
+     * Getting tenant tickets
+     *
+     * Call tenant to get list of tickets
+     *
+     * @test
+     */
+    public function testFindTikcets()
+    {
+        $client = new Test_Client(array(
+            array(
+                'app' => 'SuperTenant',
+                'regex' => '#^/api/tenant#',
+                'base' => '',
+                'sub' => include 'SuperTenant/urls.php'
+            ),
+            array(
+                'app' => 'User',
+                'regex' => '#^/api/user#',
+                'base' => '',
+                'sub' => include 'User/urls.php'
+            )
+        ));
+        // login
+        $response = $client->post('/api/user/login', array(
+            'login' => 'test',
+            'password' => 'test'
+        ));
+        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
         
-//         // find teckets
-//         $response = $client->get('/api/tenant/current/ticket/find');
-//         Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-//         Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
-//     }
-    
-//     /**
-//      * Create a ticket
-//      *
-//      * @test
-//      */
-//     public function testFindTikcetsNotEmpty()
-//     {
-//         $client = new Test_Client(array(
-//             array(
-//                 'app' => 'Tenant',
-//                 'regex' => '#^/api/tenant#',
-//                 'base' => '',
-//                 'sub' => include 'Tenant/urls.php'
-//             ),
-//             array(
-//                 'app' => 'User',
-//                 'regex' => '#^/api/user#',
-//                 'base' => '',
-//                 'sub' => include 'User/urls.php'
-//             )
-//         ));
-//         // login
-//         $response = $client->post('/api/user/login', array(
-//             'login' => 'test',
-//             'password' => 'test'
-//         ));
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
+        $tenant = Pluf_Tenant::bySubDomain('test');
         
-//         // create tecket
-//         $response = $client->post('/api/tenant/current/ticket/new', array(
-//             'type' => 'bug',
-//             'subject' => 'test ticket',
-//             'description' => 'it is not possible to test',
-//         ));
-//         Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-//         Test_Assert::assertResponseNotAnonymousModel($response, 'Ticket is not created');
-//         $t = json_decode($response->content, true);
+        // find teckets
+        $response = $client->get('/api/tenant/' . $tenant->id . '/ticket/find');
+        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
+        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
+    }
+
+    /**
+     * Create a ticket
+     *
+     * @test
+     */
+    public function testFindTikcetsNotEmpty()
+    {
+        $client = new Test_Client(array(
+            array(
+                'app' => 'SuperTenant',
+                'regex' => '#^/api/tenant#',
+                'base' => '',
+                'sub' => include 'SuperTenant/urls.php'
+            ),
+            array(
+                'app' => 'User',
+                'regex' => '#^/api/user#',
+                'base' => '',
+                'sub' => include 'User/urls.php'
+            )
+        ));
+        // login
+        $response = $client->post('/api/user/login', array(
+            'login' => 'test',
+            'password' => 'test'
+        ));
+        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
         
-//         // find teckets
-//         $response = $client->get('/api/tenant/current/ticket/find');
-//         Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-//         Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
-//         Test_Assert::assertResponseNonEmptyPaginateList($response, 'No ticket is created');
+        $tenant = Pluf_Tenant::bySubDomain('test');
         
-//         // delete ticket
-//         $response = $client->delete('/api/tenant/current/ticket/' . $t['id']);
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Ticket is removed');
-//     }
-    
-//     /**
-//      * Create a ticket
-//      *
-//      * @test
-//      */
-//     public function testCreateTikcet()
-//     {
-//         $client = new Test_Client(array(
-//             array(
-//                 'app' => 'Tenant',
-//                 'regex' => '#^/api/tenant#',
-//                 'base' => '',
-//                 'sub' => include 'Tenant/urls.php'
-//             ),
-//             array(
-//                 'app' => 'User',
-//                 'regex' => '#^/api/user#',
-//                 'base' => '',
-//                 'sub' => include 'User/urls.php'
-//             )
-//         ));
-//         // login
-//         $response = $client->post('/api/user/login', array(
-//             'login' => 'test',
-//             'password' => 'test'
-//         ));
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
+        // create tecket
+        $response = $client->post('/api/tenant/' . $tenant->id . '/ticket/new', array(
+            'type' => 'bug',
+            'subject' => 'test ticket',
+            'description' => 'it is not possible to test'
+        ));
+        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
+        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        Test_Assert::assertResponseNotAnonymousModel($response, 'Ticket is not created');
+        $t = json_decode($response->content, true);
         
-//         // create tecket
-//         $response = $client->post('/api/tenant/current/ticket/new', array(
-//             'type' => 'bug',
-//             'subject' => 'test ticket',
-//             'description' => 'it is not possible to test',
-//         ));
-//         Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-//         Test_Assert::assertResponseNotAnonymousModel($response, 'Ticket is not created');
-//         $t = json_decode($response->content, true);
+        // find teckets
+        $response = $client->get('/api/tenant/' . $tenant->id . '/ticket/find');
+        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
+        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
+        Test_Assert::assertResponseNonEmptyPaginateList($response, 'No ticket is created');
         
-//         // delete ticket
-//         $response = $client->delete('/api/tenant/current/ticket/' . $t['id']);
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Ticket is removed');
-//     }
-    
-    
-    
-//     /**
-//      * Get a ticket
-//      *
-//      * @test
-//      */
-//     public function testGetTikcet()
-//     {
-//         $client = new Test_Client(array(
-//             array(
-//                 'app' => 'Tenant',
-//                 'regex' => '#^/api/tenant#',
-//                 'base' => '',
-//                 'sub' => include 'Tenant/urls.php'
-//             ),
-//             array(
-//                 'app' => 'User',
-//                 'regex' => '#^/api/user#',
-//                 'base' => '',
-//                 'sub' => include 'User/urls.php'
-//             )
-//         ));
-//         // login
-//         $response = $client->post('/api/user/login', array(
-//             'login' => 'test',
-//             'password' => 'test'
-//         ));
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
+        // delete ticket
+        $response = $client->delete('/api/tenant/' . $tenant->id . '/ticket/' . $t['id']);
+        Test_Assert::assertResponseStatusCode($response, 200, 'Ticket is removed');
+    }
+
+    /**
+     * Create a ticket
+     *
+     * @test
+     */
+    public function testCreateTikcet()
+    {
+        $client = new Test_Client(array(
+            array(
+                'app' => 'SuperTenant',
+                'regex' => '#^/api/tenant#',
+                'base' => '',
+                'sub' => include 'SuperTenant/urls.php'
+            ),
+            array(
+                'app' => 'User',
+                'regex' => '#^/api/user#',
+                'base' => '',
+                'sub' => include 'User/urls.php'
+            )
+        ));
+        // login
+        $response = $client->post('/api/user/login', array(
+            'login' => 'test',
+            'password' => 'test'
+        ));
+        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
         
-//         // create tecket
-//         $response = $client->post('/api/tenant/current/ticket/new', array(
-//             'type' => 'bug',
-//             'subject' => 'test ticket',
-//             'description' => 'it is not possible to test',
-//         ));
-//         Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-//         Test_Assert::assertResponseNotAnonymousModel($response, 'Ticket is not created');
+        $tenant = Pluf_Tenant::bySubDomain('test');
         
-//         // Get tecket
-//         $t = json_decode($response->content, true);
-//         $response = $client->get('/api/tenant/current/ticket/' . $t['id']);
-//         Test_Assert::assertResponseNotAnonymousModel($response, 'Ticket is not find');
+        // create tecket
+        $response = $client->post('/api/tenant/' . $tenant->id . '/ticket/new', array(
+            'type' => 'bug',
+            'subject' => 'test ticket',
+            'description' => 'it is not possible to test'
+        ));
+        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
+        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        Test_Assert::assertResponseNotAnonymousModel($response, 'Ticket is not created');
+        $t = json_decode($response->content, true);
         
-//         // delete ticket
-//         $response = $client->delete('/api/tenant/current/ticket/' . $t['id']);
-//         Test_Assert::assertResponseStatusCode($response, 200, 'Ticket is removed');
-//     }
-    
-// }
+        // delete ticket
+        $response = $client->delete('/api/tenant/' . $tenant->id . '/ticket/' . $t['id']);
+        Test_Assert::assertResponseStatusCode($response, 200, 'Ticket is removed');
+    }
+
+    /**
+     * Get a ticket
+     *
+     * @test
+     */
+    public function testGetTikcet()
+    {
+        $client = new Test_Client(array(
+            array(
+                'app' => 'SuperTenant',
+                'regex' => '#^/api/tenant#',
+                'base' => '',
+                'sub' => include 'SuperTenant/urls.php'
+            ),
+            array(
+                'app' => 'User',
+                'regex' => '#^/api/user#',
+                'base' => '',
+                'sub' => include 'User/urls.php'
+            )
+        ));
+        // login
+        $response = $client->post('/api/user/login', array(
+            'login' => 'test',
+            'password' => 'test'
+        ));
+        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
+        
+        $tenant = Pluf_Tenant::bySubDomain('test');
+        
+        // create tecket
+        $response = $client->post('/api/tenant/' . $tenant->id . '/ticket/new', array(
+            'type' => 'bug',
+            'subject' => 'test ticket',
+            'description' => 'it is not possible to test'
+        ));
+        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
+        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        Test_Assert::assertResponseNotAnonymousModel($response, 'Ticket is not created');
+        
+        // Get tecket
+        $t = json_decode($response->content, true);
+        $response = $client->get('/api/tenant/' . $tenant->id . '/ticket/' . $t['id']);
+        Test_Assert::assertResponseNotAnonymousModel($response, 'Ticket is not find');
+        
+        // delete ticket
+        $response = $client->delete('/api/tenant/' . $tenant->id . '/ticket/' . $t['id']);
+        Test_Assert::assertResponseStatusCode($response, 200, 'Ticket is removed');
+    }
+}
 
