@@ -2,6 +2,8 @@
 <phpunit colors="true">
 	<testsuites>
 		<testsuite name="Pluf">
+<!-- 			<directory>./SuperTenant/</directory> -->
+			<directory>./SuperTenant_REST/</directory>
 		</testsuite>
 	</testsuites>
 

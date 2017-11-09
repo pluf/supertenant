@@ -19,26 +19,30 @@
  */
 
 /**
- * Main view
- *
- * Manage tenants and offers basics of tenant
+ * Data model of Invoice
  *
  * @author maso<mostafa.barmshory@dpq.co.ir>
+ *        
  */
-class SuperTenant_Views extends Pluf_Views
+class SuperTenant_Invoice extends Tenant_Invoice
 {
 
     /**
-     * Create a new tenant
      *
-     * @param Pluf_HTTP_Request $request
-     * @param array $match
+     * @see SuperTenant_Ticket::init()
      */
-    public function create($request, $match, $params)
+    function init()
     {
-        $params['model'] = 'Pluf_Tenant';
-        $object = parent::createObject($request, $match, $params);
-        Pluf_RowPermission::add($request->user, $object, 'Pluf.owner');
-        return $object;
+        parent::init();
+        $this->_a['multitenant'] = false;
+        $this->_a['cols'] = array_merge($this->_a['cols'], array(
+            'tenant' => array(
+                'type' => 'Pluf_DB_Field_Foreignkey',
+                'model' => 'Pluf_Tenant',
+                'blank' => false,
+                'unique' => true,
+                'editable' => false
+            )
+        ));
     }
 }

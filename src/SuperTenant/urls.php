@@ -17,75 +17,377 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 return array(
-    array( // Content urls
-        'regex' => '#^/new$#',
-        'model' => 'CMS_Views',
+    array( // Tenant urls
+        'regex' => '#^/tenant/new$#',
+        'model' => 'SuperTenant_Views',
         'method' => 'create',
         'http-method' => 'POST',
         'precond' => array(
-            'Pluf_Precondition::ownerRequired'
+            'Pluf_Precondition::loginRequired'
+        ),
+        'params' => array(
+            'model' => 'Pluf_Tenant'
         )
     ),
     array(
-        'regex' => '#^/find$#',
-        'model' => 'CMS_Views',
-        'method' => 'find',
-        'http-method' => 'GET'
+        'regex' => '#^/tenant/find$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findObject',
+        'http-method' => 'GET',
+        'params' => array(
+            'model' => 'Pluf_Tenant',
+            'listFilters' => array(
+                'title',
+                'description'
+            ),
+            'listDisplay' => array(
+                'title' => 'title',
+                'description' => 'description'
+            ),
+            'searchFields' => array(
+                'title',
+                'description'
+            ),
+            'sortFields' => array(
+                'title',
+                'description',
+                'creation_date',
+                'modif_dtime'
+            )
+        )
     ),
     array(
-        'regex' => '#^/(?P<id>\d+)$#',
-        'model' => 'CMS_Views',
-        'method' => 'get',
-        'http-method' => 'GET'
+        'regex' => '#^/tenant/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'getObject',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'model' => 'Pluf_Tenant'
+        )
     ),
     array(
-        'regex' => '#^/(?P<id>\d+)$#',
-        'model' => 'CMS_Views',
-        'method' => 'delete',
+        'regex' => '#^/tenant/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'deleteObject',
         'http-method' => 'DELETE',
         'precond' => array(
-            'Pluf_Precondition::ownerRequired'
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'model' => 'Pluf_Tenant'
         )
     ),
     array(
-        'regex' => '#^/(?P<id>\d+)$#',
-        'model' => 'CMS_Views',
-        'method' => 'update',
+        'regex' => '#^/tenant/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'updateObject',
         'http-method' => 'POST',
         'precond' => array(
-            'Pluf_Precondition::ownerRequired'
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'model' => 'Pluf_Tenant'
+        )
+    ),
+    array(
+        'regex' => '#^/tenant/(?P<parentId>\d+)/ticket/find$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/tenant/(?P<parentId>\d+)/ticket/new$#',
+        'model' => 'Pluf_Views',
+        'method' => 'createManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/tenant/(?P<parentId>\d+)/invoice/find$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Invoice'
+        )
+    ),
+    array(
+        'regex' => '#^/tenant/(?P<parentId>\d+)/invoice/new$#',
+        'model' => 'Pluf_Views',
+        'method' => 'createManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Invoice'
         )
     ),
     
-    // Download
+    /*
+     * Ticket
+     */
     array(
-        'regex' => '#^/(?P<id>\d+)/download$#',
-        'model' => 'CMS_Views',
-        'method' => 'download',
+        'regex' => '#^/(?P<parentId>\d+)/ticket/find$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findManyToOne',
         'http-method' => 'GET',
-        // Cache apram
-        'cacheable' => true,
-        'revalidate' => true,
-        'intermediate_cache' => true,
-        'max_age' => 25000
-    ),
-    array(
-        'regex' => '#^/(?P<id>\d+)/download$#',
-        'model' => 'CMS_Views',
-        'method' => 'updateFile',
-        'http-method' => 'POST',
         'precond' => array(
-            'Pluf_Precondition::memberRequired'
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Ticket',
+            'listFilters' => array(
+                'status',
+                'type',
+                'requester'
+            ),
+            'listDisplay' => array(),
+            'searchFields' => array(
+                'subject',
+                'description'
+            ),
+            'sortFields' => array(
+                'id',
+                'status',
+                'type',
+                'modif_dtime',
+                'creation_dtime'
+            ),
+            'sortOrder' => array(
+                'id',
+                'DESC'
+            )
         )
     ),
-        
-    /*
-     * Named content
-     */        
     array(
-        'regex' => '#^/(?P<name>.+)$#',
-        'model' => 'CMS_Views',
-        'method' => 'get',
-        'http-method' => 'GET'
+        'regex' => '#^/(?P<parentId>\d+)/ticket/new$#',
+        'model' => 'Pluf_Views',
+        'method' => 'createManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'Tenant_Ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/(?P<parentId>\d+)/ticket/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'getManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'Tenant_Ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/(?P<parentId>\d+)/ticket/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'updateManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'Tenant_Ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/(?P<parentId>\d+)/ticket/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'deleteManyToOne',
+        'http-method' => 'DELETE',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'Tenant_Ticket'
+        )
+    ),
+    /*
+     * Comments of ticket
+     */
+    array(
+        'regex' => '#^/ticket/(?P<parentId>\d+)/comment/find$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'model' => 'Tenant_Comment',
+            'parent' => 'Tenant_Ticket',
+            'parentKey' => 'ticket',
+            'listFilters' => array(
+                'status',
+                'type',
+                'requester'
+            ),
+            'listDisplay' => array(),
+            'searchFields' => array(
+                'subject',
+                'description'
+            ),
+            'sortFields' => array(
+                'id',
+                'status',
+                'type',
+                'modif_dtime',
+                'creation_dtime'
+            ),
+            'sortOrder' => array(
+                'id',
+                'DESC'
+            )
+        )
+    ),
+    array(
+        'regex' => '#^/ticket/(?P<parentId>\d+)/comment/new$#',
+        'model' => 'Pluf_Views',
+        'method' => 'createManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'Pluf_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'model' => 'Tenant_Comment',
+            'parent' => 'Tenant_Ticket',
+            'parentKey' => 'ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/ticket/(?P<parentId>\d+)/comment/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'getManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'model' => 'Tenant_Comment',
+            'parent' => 'Tenant_Ticket',
+            'parentKey' => 'ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/ticket/(?P<parentId>\d+)/comment/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'updateManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'Pluf_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'model' => 'Tenant_Comment',
+            'parent' => 'Tenant_Ticket',
+            'parentKey' => 'ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/ticket/(?P<parentId>\d+)/comment/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'deleteManyToOne',
+        'http-method' => 'DELETE',
+        'precond' => array(
+            'Pluf_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'model' => 'Tenant_Comment',
+            'parent' => 'Tenant_Ticket',
+            'parentKey' => 'ticket'
+        )
+    ),
+    
+    
+    /*
+     * invoices
+     */
+    array(
+        'regex' => '#^/invoice/find$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findObject',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'model' => 'Tenant_Invoice',
+            'listFilters' => array(
+                'id',
+                'status'
+            ),
+            'listDisplay' => array(),
+            'searchFields' => array(
+                'title',
+                'description'
+            ),
+            'sortFields' => array(
+                'id',
+                'status',
+                'amount',
+                'due_dtiem',
+                'modif_dtime',
+                'creation_dtime'
+            ),
+            'sortOrder' => array(
+                'id',
+                'DESC'
+            )
+        )
+    ),
+    array(
+        'regex' => '#^/invoice/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'getObject',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'model' => 'Tenant_Invoice'
+        )
     )
 );
+    
+    
+    
