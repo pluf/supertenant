@@ -18,7 +18,7 @@
  */
 return array(
     array( // Tenant urls
-        'regex' => '#^/new$#',
+        'regex' => '#^/tenant/new$#',
         'model' => 'SuperTenant_Views',
         'method' => 'create',
         'http-method' => 'POST',
@@ -30,7 +30,7 @@ return array(
         )
     ),
     array(
-        'regex' => '#^/find$#',
+        'regex' => '#^/tenant/find$#',
         'model' => 'Pluf_Views',
         'method' => 'findObject',
         'http-method' => 'GET',
@@ -57,7 +57,7 @@ return array(
         )
     ),
     array(
-        'regex' => '#^/(?P<modelId>\d+)$#',
+        'regex' => '#^/tenant/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'getObject',
         'http-method' => 'GET',
@@ -69,7 +69,7 @@ return array(
         )
     ),
     array(
-        'regex' => '#^/(?P<modelId>\d+)$#',
+        'regex' => '#^/tenant/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'deleteObject',
         'http-method' => 'DELETE',
@@ -81,7 +81,7 @@ return array(
         )
     ),
     array(
-        'regex' => '#^/(?P<modelId>\d+)$#',
+        'regex' => '#^/tenant/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'updateObject',
         'http-method' => 'POST',
@@ -92,6 +92,63 @@ return array(
             'model' => 'Pluf_Tenant'
         )
     ),
+    array(
+        'regex' => '#^/tenant/(?P<parentId>\d+)/ticket/find$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/tenant/(?P<parentId>\d+)/ticket/new$#',
+        'model' => 'Pluf_Views',
+        'method' => 'createManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Ticket'
+        )
+    ),
+    array(
+        'regex' => '#^/tenant/(?P<parentId>\d+)/invoice/find$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Invoice'
+        )
+    ),
+    array(
+        'regex' => '#^/tenant/(?P<parentId>\d+)/invoice/new$#',
+        'model' => 'Pluf_Views',
+        'method' => 'createManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'Pluf_Precondition::staffRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Invoice'
+        )
+    ),
+    
     /*
      * Ticket
      */
