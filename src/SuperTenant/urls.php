@@ -17,6 +17,36 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 return array(
+
+    /*
+     * Tenant
+     */
+    array(
+        'regex' => '#^/tenant/current$#',
+        'model' => 'Tenant_Views',
+        'method' => 'current',
+        'http-method' => 'GET',
+        'precond' => array()
+    ),
+    array(
+        'regex' => '#^/tenant/current$#',
+        'model' => 'Tenant_Views',
+        'method' => 'update',
+        'http-method' => 'POST',
+        'precond' => array(
+            'Pluf_Precondition::ownerRequired'
+        )
+    ),
+    array(
+        'regex' => '#^/tenant/current$#',
+        'model' => 'Tenant_Views',
+        'method' => 'delete',
+        'http-method' => 'DELETE',
+        'precond' => array(
+            'Pluf_Precondition::ownerRequired'
+        )
+    ),
+
     array( // Tenant urls
         'regex' => '#^/tenant/new$#',
         'model' => 'SuperTenant_Views',
@@ -153,9 +183,9 @@ return array(
      * Ticket
      */
     array(
-        'regex' => '#^/(?P<parentId>\d+)/ticket/find$#',
+        'regex' => '#^/ticket/find$#',
         'model' => 'Pluf_Views',
-        'method' => 'findManyToOne',
+        'method' => 'findObject',
         'http-method' => 'GET',
         'precond' => array(
             'Pluf_Precondition::staffRequired'
@@ -188,9 +218,9 @@ return array(
         )
     ),
     array(
-        'regex' => '#^/(?P<parentId>\d+)/ticket/new$#',
+        'regex' => '#^/ticket/new$#',
         'model' => 'Pluf_Views',
-        'method' => 'createManyToOne',
+        'method' => 'createObject',
         'http-method' => 'POST',
         'precond' => array(
             'Pluf_Precondition::staffRequired'
@@ -202,9 +232,9 @@ return array(
         )
     ),
     array(
-        'regex' => '#^/(?P<parentId>\d+)/ticket/(?P<modelId>\d+)$#',
+        'regex' => '#^/ticket/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
-        'method' => 'getManyToOne',
+        'method' => 'getObject',
         'http-method' => 'GET',
         'precond' => array(
             'Pluf_Precondition::staffRequired'
@@ -216,9 +246,9 @@ return array(
         )
     ),
     array(
-        'regex' => '#^/(?P<parentId>\d+)/ticket/(?P<modelId>\d+)$#',
+        'regex' => '#^/ticket/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
-        'method' => 'updateManyToOne',
+        'method' => 'updateObject',
         'http-method' => 'POST',
         'precond' => array(
             'Pluf_Precondition::staffRequired'
@@ -230,9 +260,9 @@ return array(
         )
     ),
     array(
-        'regex' => '#^/(?P<parentId>\d+)/ticket/(?P<modelId>\d+)$#',
+        'regex' => '#^/ticket/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
-        'method' => 'deleteManyToOne',
+        'method' => 'deleteObject',
         'http-method' => 'DELETE',
         'precond' => array(
             'Pluf_Precondition::staffRequired'
@@ -243,9 +273,6 @@ return array(
             'model' => 'Tenant_Ticket'
         )
     ),
-    /*
-     * Comments of ticket
-     */
     array(
         'regex' => '#^/ticket/(?P<parentId>\d+)/comment/find$#',
         'model' => 'Pluf_Views',
