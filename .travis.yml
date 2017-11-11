@@ -4,6 +4,7 @@ php:
   - '7.1'
 git:
   depth: 1
+
 mysql:
   database: test
   username: root
