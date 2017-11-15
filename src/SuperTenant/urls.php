@@ -17,18 +17,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 return array(
-
-    /*
-     * Tenant
-     */
-    array(
+    
+    // **************************************************************** Current Tenant
+    array( // Get
         'regex' => '#^/tenant/current$#',
         'model' => 'Tenant_Views',
         'method' => 'current',
         'http-method' => 'GET',
         'precond' => array()
     ),
-    array(
+    array( // Update
         'regex' => '#^/tenant/current$#',
         'model' => 'Tenant_Views',
         'method' => 'update',
@@ -37,7 +35,7 @@ return array(
             'Pluf_Precondition::ownerRequired'
         )
     ),
-    array(
+    array( // Delete
         'regex' => '#^/tenant/current$#',
         'model' => 'Tenant_Views',
         'method' => 'delete',
@@ -46,8 +44,8 @@ return array(
             'Pluf_Precondition::ownerRequired'
         )
     ),
-
-    array( // Tenant urls
+    // **************************************************************** Tenant
+    array( // Create new tenant
         'regex' => '#^/tenant/new$#',
         'model' => 'SuperTenant_Views',
         'method' => 'create',
@@ -59,7 +57,7 @@ return array(
             'model' => 'Pluf_Tenant'
         )
     ),
-    array(
+    array( // Find
         'regex' => '#^/tenant/find$#',
         'model' => 'Pluf_Views',
         'method' => 'findObject',
@@ -86,7 +84,7 @@ return array(
             )
         )
     ),
-    array(
+    array( // Get
         'regex' => '#^/tenant/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'getObject',
@@ -98,7 +96,7 @@ return array(
             'model' => 'Pluf_Tenant'
         )
     ),
-    array(
+    array( // Delete
         'regex' => '#^/tenant/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'deleteObject',
@@ -110,7 +108,7 @@ return array(
             'model' => 'Pluf_Tenant'
         )
     ),
-    array(
+    array( // Update
         'regex' => '#^/tenant/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'updateObject',
@@ -122,7 +120,8 @@ return array(
             'model' => 'Pluf_Tenant'
         )
     ),
-    array(
+    // **************************************************************** Tickets of a Tenant
+    array( // Find
         'regex' => '#^/tenant/(?P<parentId>\d+)/ticket/find$#',
         'model' => 'Pluf_Views',
         'method' => 'findManyToOne',
@@ -136,7 +135,7 @@ return array(
             'model' => 'SuperTenant_Ticket'
         )
     ),
-    array(
+    array( // Create
         'regex' => '#^/tenant/(?P<parentId>\d+)/ticket/new$#',
         'model' => 'Pluf_Views',
         'method' => 'createManyToOne',
@@ -150,7 +149,8 @@ return array(
             'model' => 'SuperTenant_Ticket'
         )
     ),
-    array(
+    // **************************************************************** Invoices of a Tenant
+    array( // Find
         'regex' => '#^/tenant/(?P<parentId>\d+)/invoice/find$#',
         'model' => 'Pluf_Views',
         'method' => 'findManyToOne',
@@ -164,7 +164,7 @@ return array(
             'model' => 'SuperTenant_Invoice'
         )
     ),
-    array(
+    array( // Create
         'regex' => '#^/tenant/(?P<parentId>\d+)/invoice/new$#',
         'model' => 'Pluf_Views',
         'method' => 'createManyToOne',
@@ -179,10 +179,8 @@ return array(
         )
     ),
     
-    /*
-     * Ticket
-     */
-    array(
+    // **************************************************************** Ticket
+    array( // Find
         'regex' => '#^/ticket/find$#',
         'model' => 'Pluf_Views',
         'method' => 'findObject',
@@ -217,7 +215,7 @@ return array(
             )
         )
     ),
-    array(
+    array( // Create
         'regex' => '#^/ticket/new$#',
         'model' => 'Pluf_Views',
         'method' => 'createObject',
@@ -231,7 +229,7 @@ return array(
             'model' => 'Tenant_Ticket'
         )
     ),
-    array(
+    array( // Get
         'regex' => '#^/ticket/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'getObject',
@@ -240,12 +238,10 @@ return array(
             'Pluf_Precondition::staffRequired'
         ),
         'params' => array(
-            'parent' => 'Pluf_Tenant',
-            'parentKey' => 'tenant',
             'model' => 'Tenant_Ticket'
         )
     ),
-    array(
+    array( // Update
         'regex' => '#^/ticket/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'updateObject',
@@ -259,7 +255,7 @@ return array(
             'model' => 'Tenant_Ticket'
         )
     ),
-    array(
+    array( // Delete
         'regex' => '#^/ticket/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'deleteObject',
@@ -273,7 +269,8 @@ return array(
             'model' => 'Tenant_Ticket'
         )
     ),
-    array(
+    // **************************************************************** Comments on Ticket
+    array( // Find
         'regex' => '#^/ticket/(?P<parentId>\d+)/comment/find$#',
         'model' => 'Pluf_Views',
         'method' => 'findManyToOne',
@@ -308,7 +305,7 @@ return array(
             )
         )
     ),
-    array(
+    array( // Create
         'regex' => '#^/ticket/(?P<parentId>\d+)/comment/new$#',
         'model' => 'Tenant_Views_Ticket',
         'method' => 'createManyToOne',
@@ -322,7 +319,7 @@ return array(
             'parentKey' => 'ticket'
         )
     ),
-    array(
+    array( // Get
         'regex' => '#^/ticket/(?P<parentId>\d+)/comment/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'getManyToOne',
@@ -336,7 +333,7 @@ return array(
             'parentKey' => 'ticket'
         )
     ),
-    array(
+    array( // Update
         'regex' => '#^/ticket/(?P<parentId>\d+)/comment/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'updateManyToOne',
@@ -350,7 +347,7 @@ return array(
             'parentKey' => 'ticket'
         )
     ),
-    array(
+    array( // Delete
         'regex' => '#^/ticket/(?P<parentId>\d+)/comment/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'deleteManyToOne',
@@ -365,11 +362,8 @@ return array(
         )
     ),
     
-    
-    /*
-     * invoices
-     */
-    array(
+    // **************************************************************** Invoice
+    array( // Find
         'regex' => '#^/invoice/find$#',
         'model' => 'Pluf_Views',
         'method' => 'findObject',
@@ -378,7 +372,7 @@ return array(
             'Pluf_Precondition::ownerRequired'
         ),
         'params' => array(
-            'model' => 'Tenant_Invoice',
+            'model' => 'SuperTenant_Invoice',
             'listFilters' => array(
                 'id',
                 'status'
@@ -402,7 +396,7 @@ return array(
             )
         )
     ),
-    array(
+    array( // Get
         'regex' => '#^/invoice/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
         'method' => 'getObject',
@@ -411,7 +405,7 @@ return array(
             'Pluf_Precondition::ownerRequired'
         ),
         'params' => array(
-            'model' => 'Tenant_Invoice'
+            'model' => 'SuperTenant_Invoice'
         )
     )
 );
