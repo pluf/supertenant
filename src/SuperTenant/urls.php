@@ -41,7 +41,7 @@ return array(
         'method' => 'delete',
         'http-method' => 'DELETE',
         'precond' => array(
-            'Pluf_Precondition::ownerRequired'
+            'Pluf_Precondition::adminRequired'
         )
     ),
     // **************************************************************** Tenant
