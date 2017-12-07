@@ -34,7 +34,8 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         Pluf::start(dirname(__FILE__) . '/../conf/config.rest.php');
         $m = new Pluf_Migration(array(
             'Pluf',
-            'Tenant'
+            'Tenant',
+            'SuperTenant'
         ));
         $m->install();
         // Test user
