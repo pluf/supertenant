@@ -1,7 +1,5 @@
 {
 	"name": "SuperTenant",
-	"title": "Tenant management system",
-	"model": [],
-	"permisson": [],
-	"monitor":[]
+	"version": "3.0",
+	"title": "Tenant management system"
 }
