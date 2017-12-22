@@ -34,11 +34,17 @@ class SuperTenant_Views extends Pluf_Views
      * @param Pluf_HTTP_Request $request
      * @param array $match
      */
-    public function create($request, $match, $params)
+    public function create($request, $match)
     {
-        $params['model'] = 'Pluf_Tenant';
-        $object = parent::createObject($request, $match, $params);
-        Pluf_RowPermission::add($request->user, $object, 'Pluf.owner');
-        return $object;
+        // Create a tenant
+        $tenant = new Pluf_Tenant();
+        $form = Pluf_Shortcuts_GetFormForModel($tenant, $request->REQUEST);
+        $tenant = $form->save();
+        
+        // Init the Tenant
+        $m = new Pluf_Migration(Pluf::f('installed_apps'));
+        $m->init($tenant);
+        
+        return $tenant;
     }
 }

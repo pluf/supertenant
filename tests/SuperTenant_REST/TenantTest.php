@@ -37,34 +37,49 @@ class Tenant_REST_TenantTest extends TestCase
      */
     public static function installApps()
     {
-        Pluf::start(dirname(__FILE__) . '/../conf/config.rest.php');
+        Pluf::start(__DIR__ . '/../conf/mysql.mt.conf.php');
         $m = new Pluf_Migration(array(
             'Pluf',
+            'User',
+            'Role',
+            'Group',
             'Tenant',
             'SuperTenant'
         ));
         $m->install();
+        
+        // Test tenant
+        $tenant = new Pluf_Tenant();
+        $tenant->domain = 'localhost';
+        $tenant->subdomain = 'www';
+        $tenant->validate = true;
+        if (true !== $tenant->create()) {
+            throw new Pluf_Exception('Faile to create new tenant');
+        }
+        
+        $m->init($tenant);
+        self::$tenant = $tenant;
+        
         // Test user
-        self::$user = new Pluf_User();
-        self::$user->login = 'test';
-        self::$user->first_name = 'test';
-        self::$user->last_name = 'test';
-        self::$user->email = 'toto@example.com';
-        self::$user->setPassword('test');
-        self::$user->active = true;
-        self::$user->administrator = true;
-        if (true !== self::$user->create()) {
+        $user = new User();
+        $user->login = 'test';
+        $user->first_name = 'test';
+        $user->last_name = 'test';
+        $user->email = 'toto@example.com';
+        $user->setPassword('test');
+        $user->active = true;
+        
+        if (! isset($GLOBALS['_PX_request'])) {
+            $GLOBALS['_PX_request'] = new Pluf_HTTP_Request('/');
+        }
+        $GLOBALS['_PX_request']->tenant = $tenant;
+        if (true !== $user->create()) {
             throw new Exception();
         }
         
-        // Test tenant
-        self::$tenant = new Pluf_Tenant();
-        self::$tenant->domain = 'localhost';
-        self::$tenant->subdomain = 'test';
-        self::$tenant->validate = true;
-        if (true !== self::$tenant->create()) {
-            throw new Pluf_Exception('Faile to create new tenant');
-        }
+        $per = Role::getFromString('Pluf.owner');
+        $user->setAssoc($per);
+        self::$user = $user;
         
         self::$client = new Test_Client(array(
             array(
@@ -80,15 +95,6 @@ class Tenant_REST_TenantTest extends TestCase
                 'sub' => include 'User/urls.php'
             )
         ));
-        $GLOBALS['_PX_request']->tenant = self::$tenant;
-        
-        $per = new Pluf_RowPermission();
-        $per->version = 1;
-        $per->model_id = self::$tenant->id;
-        $per->model_class = 'Pluf_Tenant';
-        $per->owner_id = self::$user->id;
-        $per->owner_class = 'Pluf_User';
-        $per->create();
     }
 
     /**
@@ -98,6 +104,9 @@ class Tenant_REST_TenantTest extends TestCase
     {
         $m = new Pluf_Migration(array(
             'Pluf',
+            'User',
+            'Role',
+            'Group',
             'Tenant',
             'SuperTenant'
         ));
@@ -271,8 +280,7 @@ class Tenant_REST_TenantTest extends TestCase
         Test_Assert::assertResponseStatusCode($response, 200);
         Test_Assert::assertResponsePaginateList($response);
     }
-    
-    
+
     /**
      * Creates tenant invoice
      *
@@ -284,7 +292,7 @@ class Tenant_REST_TenantTest extends TestCase
             'amount' => 1000,
             'title' => 'test ticket',
             'description' => 'it is not possible to test',
-            'due_dtiem' => gmdate('Y-m-d H:i:s')
+            'due_dtime' => gmdate('Y-m-d H:i:s')
         ));
         Test_Assert::assertResponseNotNull($response);
         Test_Assert::assertResponseStatusCode($response, 200);
