@@ -45,6 +45,14 @@ class SuperTenant_Views extends Pluf_Views
         $m = new Pluf_Migration(Pluf::f('installed_apps'));
         $m->init($tenant);
         
+        // TODO: update user api to get user by login directly
+        $user = new User();
+        $user = $user->getUser('admin');
+        $role = Role::getFromString('Pluf.owner');
+        
+        // Set owner
+        $user->setAssoc($role);
+        
         return $tenant;
     }
 }
