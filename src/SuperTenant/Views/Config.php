@@ -16,33 +16,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use PHPUnit\Framework\TestCase;
-
-require_once 'Pluf.php';
+Pluf::loadFunction('Pluf_Shortcuts_GetObjectOr404');
+Pluf::loadFunction('Pluf_Shortcuts_GetFormForModel');
 
 /**
- * @backupGlobals disabled
- * @backupStaticAttributes disabled
+ * لایه نمایش مدیریت گروه‌ها را به صورت پیش فرض ایجاد می‌کند
+ *
+ * @author maso
+ *        
  */
-class SuperTenant_Api extends TestCase
+class Config_Views extends Pluf_Views
 {
 
     /**
-     * @before
+     * مقدار یک خصوصیت را تعیین می‌کند.
+     *
+     * @param Pluf_HTTP_Request $request
+     * @param array $match
      */
-    public function setUp()
-    {
-        Pluf::start(__DIR__ . '/../conf/config.php');
-    }
-
-    /**
-     * @test
-     */
-    public function testClassInstance()
-    {
-        // $c = new CMS_Content();
-        // $this->assertTrue(isset($c));
-        $this->assertTrue(true);
+    public function get($request, $match)
+    { // Set the default
+        $sql = new Pluf_SQL('`key`=%s', array(
+            $match['key']
+        ));
+        $model = new SuperTenant_Configuration();
+        $model = $model->getOne(array(
+            'filter' => $sql->gen()
+        ));
+        if (! isset($model)) {
+            $model = new SuperTenant_Configuration();
+        }
+        return $model;
     }
 }
-

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of Pluf Framework, a simple PHP Application Framework.
  * Copyright (C) 2010-2020 Phoinex Scholars Co. (http://dpq.co.ir)
@@ -16,33 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use PHPUnit\Framework\TestCase;
-
-require_once 'Pluf.php';
 
 /**
- * @backupGlobals disabled
- * @backupStaticAttributes disabled
+ * Display a tenant attribute.
  */
-class SuperTenant_Api extends TestCase
+class SuperTenant_Template_Tag extends Pluf_Template_Tag
 {
 
-    /**
-     * @before
-     */
-    public function setUp()
+    function start ($key, $defValue = '')
     {
-        Pluf::start(__DIR__ . '/../conf/config.php');
-    }
-
-    /**
-     * @test
-     */
-    public function testClassInstance()
-    {
-        // $c = new CMS_Content();
-        // $this->assertTrue(isset($c));
-        $this->assertTrue(true);
+        echo SuperTenant_ConfigService::get($key, $defValue);
     }
 }
 
