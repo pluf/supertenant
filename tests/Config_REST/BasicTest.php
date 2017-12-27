@@ -35,36 +35,28 @@ class Config_REST_BasicTest extends TestCase
      */
     public static function createDataBase()
     {
-        Pluf::start(__DIR__ . '/../conf/mysql.conf.php');
-        $m = new Pluf_Migration(array(
-            'Pluf',
-            'User',
-            'Role',
-            'Config'
-        ));
+        Pluf::start(__DIR__ . '/../conf/config.php');
+        $m = new Pluf_Migration(Pluf::f('installed_apps'));
         $m->install();
-        // Test user
-        self::$user = new User();
-        self::$user->login = 'test';
-        self::$user->first_name = 'test';
-        self::$user->last_name = 'test';
-        self::$user->email = 'toto@example.com';
-        self::$user->setPassword('test');
-        self::$user->active = true;
-        self::$user->administrator = true;
-        if (true !== self::$user->create()) {
-            throw new Pluf_Exception();
-        }
         
-        $role = Role::getFromString('Pluf.owner');
-        self::$user->setAssoc($role);
+        $view = new SuperTenant_Views();
+        $request = new Pluf_HTTP_Request('/');
+        $request->tenant = new Pluf_Tenant(1);
+        $request->REQUEST = array(
+            'title' => 'Main tenant',
+            'description' => 'Description of the main tenant',
+            'domain' => 'localhost',
+            'subdomain' => 'www',
+            'validate' => true
+        );
+        $view->create($request, array());
         
         self::$client = new Test_Client(array(
             array(
-                'app' => 'Config',
-                'regex' => '#^/api/config#',
+                'app' => 'SuperTenant',
+                'regex' => '#^/api/saas#',
                 'base' => '',
-                'sub' => include 'Config/urls.php'
+                'sub' => include 'SuperTenant/urls.php'
             ),
             array(
                 'app' => 'User',
@@ -80,12 +72,7 @@ class Config_REST_BasicTest extends TestCase
      */
     public static function removeDatabses()
     {
-        $m = new Pluf_Migration(array(
-            'Pluf',
-            'User',
-            'Role',
-            'Config'
-        ));
+        $m = new Pluf_Migration(Pluf::f('installed_apps'));
         $m->unInstall();
     }
 
@@ -96,12 +83,12 @@ class Config_REST_BasicTest extends TestCase
     {
         // login
         $response = self::$client->post('/api/user/login', array(
-            'login' => 'test',
-            'password' => 'test'
+            'login' => 'admin',
+            'password' => 'admin'
         ));
         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
         
-        $response = self::$client->get('/api/config/find');
+        $response = self::$client->get('/api/saas/config/find');
         Test_Assert::assertResponseNotNull($response, 'Find result is empty');
         Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
         Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');

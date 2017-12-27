@@ -3,12 +3,12 @@
 	<testsuites>
 		<testsuite name="Config">
 			<directory>tests/Config_Template/</directory>
-<!-- 			<directory>tests/SuperTenant_REST/</directory> -->
+			<directory>tests/Config_REST/</directory>
 		</testsuite>
-<!-- 		<testsuite name="Config"> -->
-<!-- 			<directory>tests/SuperTenant/</directory> -->
-<!-- 			<directory>tests/SuperTenant_REST/</directory> -->
-<!-- 		</testsuite> -->
+		<testsuite name="Tenant">
+			<directory>tests/SuperTenant/</directory>
+			<directory>tests/SuperTenant_REST/</directory>
+		</testsuite>
 	</testsuites>
 
 	<!-- Code coverage -->
@@ -18,6 +18,6 @@
 		</whitelist>
 	</filter>
 	<logging>
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
+		<log type="coverage-clover" target="build/logs/clover.xml" />
 	</logging>
 </phpunit>

@@ -20,6 +20,10 @@ use PHPUnit\Framework\TestCase;
 
 require_once 'Pluf.php';
 
+/**
+ * @backupGlobals disabled
+ * @backupStaticAttributes disabled
+ */
 class SuperTenant_Api extends TestCase
 {
 
@@ -28,7 +32,7 @@ class SuperTenant_Api extends TestCase
      */
     public function setUp()
     {
-        Pluf::start(dirname(__FILE__) . '/../conf/config.mysql.php');
+        Pluf::start(__DIR__ . '/../conf/config.php');
     }
 
     /**
@@ -36,8 +40,8 @@ class SuperTenant_Api extends TestCase
      */
     public function testClassInstance()
     {
-//         $c = new CMS_Content();
-//         $this->assertTrue(isset($c));
+        // $c = new CMS_Content();
+        // $this->assertTrue(isset($c));
         $this->assertTrue(true);
     }
 }

@@ -37,15 +37,8 @@ class Tenant_REST_TenantTest extends TestCase
      */
     public static function installApps()
     {
-        Pluf::start(__DIR__ . '/../conf/mysql.mt.conf.php');
-        $m = new Pluf_Migration(array(
-            'Pluf',
-            'User',
-            'Role',
-            'Group',
-            'Tenant',
-            'SuperTenant'
-        ));
+        Pluf::start(__DIR__ . '/../conf/config.php');
+        $m = new Pluf_Migration(Pluf::f('installed_apps'));
         $m->install();
         
         // Test tenant
@@ -102,14 +95,7 @@ class Tenant_REST_TenantTest extends TestCase
      */
     public static function uninstallApps()
     {
-        $m = new Pluf_Migration(array(
-            'Pluf',
-            'User',
-            'Role',
-            'Group',
-            'Tenant',
-            'SuperTenant'
-        ));
+        $m = new Pluf_Migration(Pluf::f('installed_apps'));
         $m->unInstall();
     }
 
@@ -210,7 +196,7 @@ class Tenant_REST_TenantTest extends TestCase
      *
      * @test
      */
-    public function testCreateTinant()
+    public function testCreateTenant()
     {
         $testSubdomain = 'test' . rand();
         // find comments
