@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit colors="true">
 	<testsuites>
-		<testsuite name="Pluf">
-			<directory>tests/SuperTenant/</directory>
-			<directory>tests/SuperTenant_REST/</directory>
+		<testsuite name="Config">
+			<directory>tests/Config_Template/</directory>
+<!-- 			<directory>tests/SuperTenant_REST/</directory> -->
 		</testsuite>
+<!-- 		<testsuite name="Config"> -->
+<!-- 			<directory>tests/SuperTenant/</directory> -->
+<!-- 			<directory>tests/SuperTenant_REST/</directory> -->
+<!-- 		</testsuite> -->
 	</testsuites>
 
 	<!-- Code coverage -->
