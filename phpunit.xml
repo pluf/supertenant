@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit colors="true">
 	<testsuites>
+		<testsuite name="Invoices">
+			<directory>tests/Invoices_REST/</directory>
+		</testsuite>
 		<testsuite name="Config">
 			<directory>tests/Config_Template/</directory>
 			<directory>tests/Config_REST/</directory>

@@ -49,13 +49,7 @@ return array(
         'regex' => '#^/tenant/new$#',
         'model' => 'SuperTenant_Views',
         'method' => 'create',
-        'http-method' => 'POST',
-        'precond' => array(
-            'User_Precondition::loginRequired'
-        ),
-        'params' => array(
-            'model' => 'Pluf_Tenant'
-        )
+        'http-method' => 'POST'
     ),
     array( // Find
         'regex' => '#^/tenant/find$#',
@@ -89,9 +83,6 @@ return array(
         'model' => 'Pluf_Views',
         'method' => 'getObject',
         'http-method' => 'GET',
-        'precond' => array(
-            'User_Precondition::ownerRequired'
-        ),
         'params' => array(
             'model' => 'Pluf_Tenant'
         )
@@ -409,7 +400,7 @@ return array(
         )
     ),
     
-    // **************************************************************** Config
+    // ***************************************************************  * Config
     array(
         'regex' => '#^/config/find$#',
         'model' => 'Pluf_Views',

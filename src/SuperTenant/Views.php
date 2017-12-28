@@ -38,6 +38,9 @@ class SuperTenant_Views extends Pluf_Views
     {
         // Create a tenant
         $tenant = new Pluf_Tenant();
+        if(!isset($request->REQUEST['domain'])){
+            $request->REQUEST['domain'] = $request->REQUEST['subdomain'] . '.' . Pluf::f('general_domain', 'pluf.ir');
+        }
         $form = Pluf_Shortcuts_GetFormForModel($tenant, $request->REQUEST);
         $tenant = $form->save();
         
