@@ -23,9 +23,9 @@ require_once 'Pluf.php';
  * @backupGlobals disabled
  * @backupStaticAttributes disabled
  */
-class SuperTenant_REST_InvoicesTest extends TestCase
+class Invoices_REST_SelfTest extends TestCase
 {
-    
+
     /**
      * @beforeClass
      */
@@ -35,39 +35,20 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         $m = new Pluf_Migration(Pluf::f('installed_apps'));
         $m->install();
         
-        
-        // Test tenant
-        $tenant = new Pluf_Tenant();
-        $tenant->domain = 'localhost';
-        $tenant->subdomain = 'www';
-        $tenant->validate = true;
-        if (true !== $tenant->create()) {
-            throw new Pluf_Exception('Faile to create new tenant');
-        }
-        
-        $m->init($tenant);
-        
-        // Test user
-        $user = new User();
-        $user->login = 'test';
-        $user->first_name = 'test';
-        $user->last_name = 'test';
-        $user->email = 'toto@example.com';
-        $user->setPassword('test');
-        $user->active = true;
-        
-        if(!isset($GLOBALS['_PX_request'])){
-            $GLOBALS['_PX_request'] = new Pluf_HTTP_Request('/');
-        }
-        $GLOBALS['_PX_request']->tenant= $tenant;
-        if (true !== $user->create()) {
-            throw new Exception();
-        }
-        
-        $per = Role::getFromString('Pluf.owner');
-        $user->setAssoc($per);
+        // Main tenant
+        $view = new SuperTenant_Views();
+        $request = new Pluf_HTTP_Request('/');
+        $request->tenant = new Pluf_Tenant(1);
+        $request->REQUEST = array(
+            'title' => 'Main tenant',
+            'description' => 'Description of the main tenant',
+            'domain' => 'pluf.ir',
+            'subdomain' => 'www',
+            'validate' => true
+        );
+        $view->create($request, array());
     }
-    
+
     /**
      * @afterClass
      */
@@ -76,7 +57,7 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         $m = new Pluf_Migration(Pluf::f('installed_apps'));
         $m->unInstall();
     }
-    
+
     /**
      * Getting invoice list
      *
@@ -87,7 +68,7 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         $client = new Test_Client(array(
             array(
                 'app' => 'SuperTenant',
-                'regex' => '#^/api/tenant#',
+                'regex' => '#^/api/saas#',
                 'base' => '',
                 'sub' => include 'SuperTenant/urls.php'
             ),
@@ -100,8 +81,8 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         ));
         // login
         $response = $client->post('/api/user/login', array(
-            'login' => 'test',
-            'password' => 'test'
+            'login' => 'admin',
+            'password' => 'admin'
         ));
         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
         
@@ -111,7 +92,7 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         Test_Assert::assertResponseNotAnonymousModel($response, 'Current user is anonymous');
         
         // find
-        $response = $client->get('/api/tenant/invoice/find');
+        $response = $client->get('/api/saas/invoice/find');
         Test_Assert::assertResponseNotNull($response, 'Find result is empty');
         Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
         Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
@@ -129,7 +110,7 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         $client = new Test_Client(array(
             array(
                 'app' => 'SuperTenant',
-                'regex' => '#^/api/tenant#',
+                'regex' => '#^/api/saas#',
                 'base' => '',
                 'sub' => include 'SuperTenant/urls.php'
             ),
@@ -142,8 +123,8 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         ));
         // login
         $response = $client->post('/api/user/login', array(
-            'login' => 'test',
-            'password' => 'test'
+            'login' => 'admin',
+            'password' => 'admin'
         ));
         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
         
@@ -160,7 +141,7 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         $i->create();
         
         // find
-        $response = $client->get('/api/tenant/invoice/find');
+        $response = $client->get('/api/saas/invoice/find');
         Test_Assert::assertResponseNotNull($response, 'Find result is empty');
         Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
         Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
@@ -169,8 +150,7 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         // delete
         $i->delete();
     }
-    
-    
+
     /**
      * Getting invoice
      *
@@ -181,7 +161,7 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         $client = new Test_Client(array(
             array(
                 'app' => 'SuperTenant',
-                'regex' => '#^/api/tenant#',
+                'regex' => '#^/api/saas#',
                 'base' => '',
                 'sub' => include 'SuperTenant/urls.php'
             ),
@@ -194,8 +174,8 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         ));
         // login
         $response = $client->post('/api/user/login', array(
-            'login' => 'test',
-            'password' => 'test'
+            'login' => 'admin',
+            'password' => 'admin'
         ));
         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
         
@@ -212,7 +192,7 @@ class SuperTenant_REST_InvoicesTest extends TestCase
         $i->create();
         
         // find
-        $response = $client->get('/api/tenant/invoice/'. $i->id);
+        $response = $client->get('/api/saas/invoice/' . $i->id);
         Test_Assert::assertResponseNotNull($response);
         Test_Assert::assertResponseStatusCode($response, 200);
         Test_Assert::assertResponseNotAnonymousModel($response, 'Invoice not foudn');
