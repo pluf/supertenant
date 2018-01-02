@@ -52,7 +52,6 @@ class SuperTenant_Configuration extends Pluf_Model
                 'type' => 'Pluf_DB_Field_Foreignkey',
                 'model' => 'Pluf_Tenant',
                 'blank' => false,
-                'unique' => true,
                 'editable' => false
             ),
             'mod' => array(
