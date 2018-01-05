@@ -63,7 +63,7 @@ class SuperTenant_Configuration extends Pluf_Model
                 'type' => 'Pluf_DB_Field_Varchar',
                 'blank' => false,
                 'size' => 250,
-                'editable' => false,
+                'editable' => true,
                 'readable' => true
             ),
             'value' => array(

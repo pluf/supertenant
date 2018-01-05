@@ -34,7 +34,8 @@ class SuperTenant_ConfigService
         // example entry
         'key' => array(
             'value' => 'value',
-            'derty' => false
+            'derty' => false,
+            'tenant' => 0
         )
     );
 
@@ -44,18 +45,23 @@ class SuperTenant_ConfigService
      * @param object $defValue
      * @return boolean|object|string
      */
-    public static function get($key, $defValue)
+    public static function get($key, $defValue, $tenant = null)
     {
-        if (array_key_exists($key, self::$inMemory)) {
-            $entary = self::$inMemory[$key];
+        $req = $GLOBALS['_PX_request'];
+        $myTenant = $tenant === null ? $req->tenant : $tenant;
+        $memKey = $myTenant->id . '_' . $key;
+        if (array_key_exists($memKey, self::$inMemory)) {
+            $entary = self::$inMemory[$memKey];
         } else {
             $entary = array(
                 'value' => $defValue,
-                'derty' => false
+                'derty' => false,
+                'tenant' => $myTenant->id
             );
             // TODO: maso, 2017: load value
-            $sql = new Pluf_SQL('`key`=%s', array(
-                $key
+            $sql = new Pluf_SQL('`key`=%s AND `tenant`=%s', array(
+                $key,
+                $myTenant->id
             ));
             $config = new SuperTenant_Configuration();
             $config = $config->getOne(array(
@@ -67,7 +73,7 @@ class SuperTenant_ConfigService
                 $entary['derty'] = true;
             }
         }
-        self::$inMemory[$key] = $entary;
+        self::$inMemory[$memKey] = $entary;
         return $entary['value'];
     }
 }

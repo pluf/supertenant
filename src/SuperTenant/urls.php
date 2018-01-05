@@ -169,7 +169,63 @@ return array(
             'model' => 'SuperTenant_Invoice'
         )
     ),
-    
+    // **************************************************************** Configs of a Tenant
+    array( // Find
+        'regex' => '#^/tenant/(?P<parentId>\d+)/config/find$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'User_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Configuration'
+        )
+    ),
+    array( // Create
+        'regex' => '#^/tenant/(?P<parentId>\d+)/config/new$#',
+        'model' => 'Pluf_Views',
+        'method' => 'createManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'User_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Configuration'
+        )
+    ),
+    array( // Update
+        'regex' => '#^/tenant/(?P<parentId>\d+)/config/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'updateManyToOne',
+        'http-method' => 'POST',
+        'precond' => array(
+            'User_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Configuration'
+        )
+    ),
+    array( // Delete
+        'regex' => '#^/tenant/(?P<parentId>\d+)/config/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'deleteManyToOne',
+        'http-method' => 'DELETE',
+        'precond' => array(
+            'User_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Configuration'
+        )
+    ),
     // **************************************************************** Ticket
     array( // Find
         'regex' => '#^/ticket/find$#',
@@ -400,7 +456,7 @@ return array(
         )
     ),
     
-    // ***************************************************************  * Config
+    // **************************************************************** Config
     array(
         'regex' => '#^/config/find$#',
         'model' => 'Pluf_Views',
