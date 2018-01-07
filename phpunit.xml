@@ -6,11 +6,11 @@
 		</testsuite>
 		<testsuite name="Config">
 			<directory>tests/Config_Template/</directory>
-<!-- 			<directory>tests/Config_REST/</directory> -->
-<!-- 		</testsuite> -->
-<!-- 		<testsuite name="Tenant"> -->
-<!-- 			<directory>tests/SuperTenant/</directory> -->
-<!-- 			<directory>tests/SuperTenant_REST/</directory> -->
+			<directory>tests/Config_REST/</directory>
+		</testsuite>
+		<testsuite name="Tenant">
+			<directory>tests/SuperTenant/</directory>
+			<directory>tests/SuperTenant_REST/</directory>
 		</testsuite>
 	</testsuites>
 
