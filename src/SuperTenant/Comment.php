@@ -38,7 +38,6 @@ class SuperTenant_Comment extends Tenant_Comment
                 'type' => 'Pluf_DB_Field_Foreignkey',
                 'model' => 'Pluf_Tenant',
                 'blank' => false,
-                'unique' => true,
                 'editable' => false
             )
         ));
