@@ -47,8 +47,7 @@ class SuperTenant_ConfigService
      */
     public static function get($key, $defValue, $tenant = null)
     {
-        $req = $GLOBALS['_PX_request'];
-        $myTenant = $tenant === null ? $req->tenant : $tenant;
+        $myTenant = $tenant === null ? Pluf_Tenant::current() : $tenant;
         $memKey = $myTenant->id . '_' . $key;
         if (array_key_exists($memKey, self::$inMemory)) {
             $entary = self::$inMemory[$memKey];

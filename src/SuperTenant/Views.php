@@ -38,7 +38,7 @@ class SuperTenant_Views extends Pluf_Views
     {
         // Create a tenant
         $tenant = new Pluf_Tenant();
-        if(!isset($request->REQUEST['domain'])){
+        if (! isset($request->REQUEST['domain'])) {
             $request->REQUEST['domain'] = $request->REQUEST['subdomain'] . '.' . Pluf::f('general_domain', 'pluf.ir');
         }
         $form = Pluf_Shortcuts_GetFormForModel($tenant, $request->REQUEST);
@@ -55,6 +55,17 @@ class SuperTenant_Views extends Pluf_Views
         
         // Set owner
         $user->setAssoc($role);
+        
+        // install spacs
+        $spas = Pluf::f('spas', array());
+        if (sizeof($spas) > 0) {
+            Tenant_Service::setSetting('spa.default', $spas[0]);
+            if (class_exists('Spa_Service')) {
+                foreach ($spas as $spa) {
+                    Spa_Service::installFromRepository($spa);
+                }
+            }
+        }
         
         return $tenant;
     }
