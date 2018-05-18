@@ -16,5 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+ Pluf_Signal::connect('Pluf_Dispatcher::postDispatch',
+    array(
+        'SuperTenant_ConfigService',
+        'flush'
+    ), 'Pluf_Dispatcher');
+    
 return array(
 );

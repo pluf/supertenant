@@ -48,7 +48,7 @@ class SuperTenant_ConfigService
     public static function get($key, $defValue, $tenant = null)
     {
         $myTenant = $tenant === null ? Pluf_Tenant::current() : $tenant;
-        $memKey = $myTenant->id . '_' . $key;
+        $memKey = $key;
         if (array_key_exists($memKey, self::$inMemory)) {
             $entary = self::$inMemory[$memKey];
         } else {
@@ -74,5 +74,36 @@ class SuperTenant_ConfigService
         }
         self::$inMemory[$memKey] = $entary;
         return $entary['value'];
+    }
+    
+    
+    /**
+     */
+    public static function flush()
+    {
+        foreach (self::$inMemory as $key => $val) {
+            if ($val['derty']) {
+                // TODO: maso, 2017: load value
+                $sql = new Pluf_SQL('`key`=%s', array(
+                    $key
+                ));
+                $setting = new SuperTenant_Configuration();
+                $setting = $setting->getOne(array(
+                    'filter' => $sql->gen()
+                ));
+                if (isset($setting)) {
+                    $setting->value = $val['value'];
+                    $setting->update();
+                } else {
+                    $myTenant = Pluf_Tenant::current();
+                    $setting = new SuperTenant_Configuration();
+                    $setting->value = $val['value'];
+                    $setting->key = $key;
+                    $setting->mod = 0;
+                    $setting->tenant = $myTenant;
+                    $setting->create();
+                }
+            }
+        }
     }
 }
