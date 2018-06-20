@@ -45,9 +45,9 @@ class SuperTenant_ConfigService
      * @param object $defValue
      * @return boolean|object|string
      */
-    public static function get($key, $defValue, $tenant = null)
+    public static function get($key, $defValue)
     {
-        $myTenant = $tenant === null ? Pluf_Tenant::current() : $tenant;
+        $myTenant = Pluf_Tenant::current();
         $memKey = $key;
         if (array_key_exists($memKey, self::$inMemory)) {
             $entary = self::$inMemory[$memKey];
@@ -83,25 +83,26 @@ class SuperTenant_ConfigService
     {
         foreach (self::$inMemory as $key => $val) {
             if ($val['derty']) {
+                $myTenant = Pluf_Tenant::current();
                 // TODO: maso, 2017: load value
-                $sql = new Pluf_SQL('`key`=%s', array(
-                    $key
+                $sql = new Pluf_SQL('`key`=%s AND `tenant`=%s', array(
+                    $key,
+                    $myTenant->id
                 ));
-                $setting = new SuperTenant_Configuration();
-                $setting = $setting->getOne(array(
+                $config = new SuperTenant_Configuration();
+                $config = $config->getOne(array(
                     'filter' => $sql->gen()
                 ));
-                if (isset($setting)) {
-                    $setting->value = $val['value'];
-                    $setting->update();
+                if (isset($config)) {
+                    $config->value = $val['value'];
+                    $config->update();
                 } else {
-                    $myTenant = Pluf_Tenant::current();
-                    $setting = new SuperTenant_Configuration();
-                    $setting->value = $val['value'];
-                    $setting->key = $key;
-                    $setting->mod = 0;
-                    $setting->tenant = $myTenant;
-                    $setting->create();
+                    $config = new SuperTenant_Configuration();
+                    $config->value = $val['value'];
+                    $config->key = $key;
+                    $config->mod = 0;
+                    $config->tenant = $myTenant;
+                    $config->create();
                 }
             }
         }
