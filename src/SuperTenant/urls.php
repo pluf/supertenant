@@ -59,18 +59,25 @@ return array(
         'params' => array(
             'model' => 'Pluf_Tenant',
             'listFilters' => array(
-                'title',
-                'description'
+                'id',
+                'domain',
+                'subdomain',
+                'title'
             ),
             'listDisplay' => array(
                 'title' => 'title',
                 'description' => 'description'
             ),
             'searchFields' => array(
+                'domain',
+                'subdomain',
                 'title',
                 'description'
             ),
             'sortFields' => array(
+                'id',
+                'domain',
+                'subdomain',
                 'title',
                 'description',
                 'creation_date',
