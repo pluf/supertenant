@@ -49,9 +49,9 @@ class SuperTenant_Views extends Pluf_Views
         $m->init($tenant);
         
         // TODO: update user api to get user by login directly
-        $user = new User();
+        $user = new User_Account();
         $user = $user->getUser('admin');
-        $role = Role::getFromString('Pluf.owner');
+        $role = User_Role::getFromString('Pluf.owner');
         
         // Set owner
         $user->setAssoc($role);
