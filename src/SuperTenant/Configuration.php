@@ -23,98 +23,26 @@
  * @author maso <mostafa.barmshory@dpq.co.ir>
  *        
  */
-class SuperTenant_Configuration extends Pluf_Model
+class SuperTenant_Configuration extends Tenant_Configuration
 {
 
-    const MOD_PRIVATE = 0;
- // 000
-    const MOD_PUBLIC = 1;
- // 001
-    
     /**
      * @brief مدل داده‌ای را بارگذاری می‌کند.
      *
-     * @see Pluf_Model::init()
+     * @see Tenant_Configuration::init()
      */
     function init()
     {
-        $this->_a['table'] = 'configurations';
-        $this->_a['verbose'] = 'Configuration';
+        parent::init();
         $this->_a['multitenant'] = false;
-        $this->_a['cols'] = array(
-            'id' => array(
-                'type' => 'Pluf_DB_Field_Sequence',
-                'blank' => true,
-                'editable' => false,
-                'readable' => true
-            ),
+        $this->_a['cols'] = array_merge($this->_a['cols'], array(
             'tenant' => array(
                 'type' => 'Pluf_DB_Field_Foreignkey',
                 'model' => 'Pluf_Tenant',
-                'blank' => false,
+                'is_null' => false,
                 'editable' => false
             ),
-            'mod' => array(
-                'type' => 'Pluf_DB_Field_Integer',
-                'blank' => false,
-                'editable' => false
-            ),
-            'key' => array(
-                'type' => 'Pluf_DB_Field_Varchar',
-                'blank' => false,
-                'size' => 250,
-                'editable' => true,
-                'readable' => true
-            ),
-            'value' => array(
-                'type' => 'Pluf_DB_Field_Varchar',
-                'blank' => true,
-                'size' => 250,
-                'editable' => true,
-                'readable' => true
-            ),
-            'description' => array(
-                'type' => 'Pluf_DB_Field_Varchar',
-                'blank' => true,
-                'size' => 250,
-                'editable' => true,
-                'readable' => true
-            ),
-            'creation_dtime' => array(
-                'type' => 'Pluf_DB_Field_Datetime',
-                'blank' => true,
-                'verbose' => __('creation date'),
-                'help_text' => __('Creation date of the configuration.'),
-                'editable' => false,
-                'readable' => true
-            ),
-            'modif_dtime' => array(
-                'type' => 'Pluf_DB_Field_Datetime',
-                'blank' => true,
-                'verbose' => __('modification date'),
-                'help_text' => __('Modification date of the configuration.'),
-                'editable' => false,
-                'readable' => true
-            )
-        );
-        $this->_a['idx'] = array(
-            'key_idx' => array(
-                'type' => 'unique',
-                'col' => 'tenant, key'
-            )
-        );
+        ));
     }
 
-    /**
-     *
-     * {@inheritdoc}
-     * @see Pluf_Model::preSave()
-     */
-    function preSave($create = false)
-    {
-        if ($this->id == '') {
-            $this->creation_dtime = gmdate('Y-m-d H:i:s');
-        }
-        $this->modif_dtime = gmdate('Y-m-d H:i:s');
-    }
 }

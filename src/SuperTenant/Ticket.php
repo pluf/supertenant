@@ -29,7 +29,7 @@ class SuperTenant_Ticket extends Tenant_Ticket
 
     /**
      *
-     * @see SuperTenant_Ticket::init()
+     * @see Tenant_Ticket::init()
      */
     function init()
     {
