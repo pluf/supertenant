@@ -21,3 +21,16 @@ function SuperTenant_Shortcuts_NormalizeItemPerPage ($request)
         $count = 30;
     return $count;
 }
+
+function SuperTenant_Shortcuts_GetTenantFeildProperties(){
+    return array(
+        'tenant' => array(
+            'type' => 'Pluf_DB_Field_Foreignkey',
+            'model' => 'Pluf_Tenant',
+            'is_null' => false,
+            'editable' => false,
+            'relate_name' => 'tenant',
+            'graphql_feild' => true
+        )
+    );
+}
