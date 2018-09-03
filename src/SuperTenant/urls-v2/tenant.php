@@ -183,20 +183,20 @@ return array(
             'model' => 'SuperTenant_Ticket'
         )
     ),
-//     array( // Update
-//         'regex' => '#^/tenants/(?P<parentId>\d+)/tickets/(?P<modelId>\d+)$#',
-//         'model' => 'Pluf_Views',
-//         'method' => 'updateManyToOne',
-//         'http-method' => 'POST',
-//         'precond' => array(
-//             'User_Precondition::ownerRequired'
-//         ),
-//         'params' => array(
-//             'parent' => 'Pluf_Tenant',
-//             'parentKey' => 'tenant',
-//             'model' => 'SuperTenant_Ticket'
-//         )
-//     ),
+    // array( // Update
+    // 'regex' => '#^/tenants/(?P<parentId>\d+)/tickets/(?P<modelId>\d+)$#',
+    // 'model' => 'Pluf_Views',
+    // 'method' => 'updateManyToOne',
+    // 'http-method' => 'POST',
+    // 'precond' => array(
+    // 'User_Precondition::ownerRequired'
+    // ),
+    // 'params' => array(
+    // 'parent' => 'Pluf_Tenant',
+    // 'parentKey' => 'tenant',
+    // 'model' => 'SuperTenant_Ticket'
+    // )
+    // ),
     array( // Delete
         'regex' => '#^/tenants/(?P<parentId>\d+)/tickets/(?P<modelId>\d+)$#',
         'model' => 'Pluf_Views',
@@ -290,6 +290,66 @@ return array(
             'parentKey' => 'tenant',
             'model' => 'SuperTenant_Configuration'
         )
+    ),
+
+    // ************************************************** Accounts (Members) of a Tenant
+
+//     array( // Create
+//         'regex' => '#^/tenants/(?P<parentId>\d+)/members$#',
+//         'model' => 'User_Views_Account',
+//         'method' => 'create',
+//         'http-method' => array(
+//             'PUT',
+//             'POST'
+//         )
+//     ),
+    array( // Read (list)
+        'regex' => '#^/tenants/(?P<parentId>\d+)/members$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'User_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Member',
+            'sql' => 'is_deleted=false'
+        )
+    ),
+    array( // Read
+        'regex' => '#^/tenants/(?P<parentId>\d+)/members/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'getManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'User_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_Member',
+            'sql' => 'is_deleted=false'
+        )
+    ),
+    // array( // Update
+    // 'regex' => '#^/tenants/(?P<parentId>\d+)/accounts/(?P<userId>\d+)$#',
+    // 'model' => 'User_Views_Account',
+    // 'method' => 'update',
+    // 'precond' => array(
+    // 'User_Precondition::ownerRequired'
+    // ),
+    // 'http-method' => 'POST'
+    // ),
+    array( // Delete
+        'regex' => '#^/tenants/(?P<tenantId>\d+)/members/(?P<userId>\d+)$#',
+        'model' => 'SuperTenant_Views_Member',
+        'method' => 'delete',
+        'precond' => array(
+            'User_Precondition::ownerRequired'
+        ),
+        'http-method' => 'DELETE'
     )
 );
 
