@@ -1,5 +1,5 @@
 <?php
-
+Pluf::loadFunction('SuperTenant_Shortcutes_CheckTenant');
 /*
  * This file is part of Pluf Framework, a simple PHP Application Framework.
  * Copyright (C) 2010-2020 Phoinex Scholars Co. (http://dpq.co.ir)
@@ -41,15 +41,7 @@ class SuperTenant_Views_Configuration extends Pluf_Views
         if (! isset($model)) {
             throw new Pluf_Exception_DoesNotExist('Configuration not found');
         }
-        $tenant = null;
-        if(isset($request->REQUEST['tenant'])){
-            $tenant = Pluf_Shortcuts_GetObjectOr404('Pluf_Tenant', $request->REQUEST['tenant']);
-        }else if(isset($match['tenantId'])){
-            $tenant = Pluf_Shortcuts_GetObjectOr404('Pluf_Tenant', $match['tenantId']);
-        }
-        if(isset($tenant) && $tenant->id !== $model->tenant){
-            return new Pluf_HTTP_Error404('Invalid relation');
-        }
+        SuperTenant_Shortcutes_CheckTenant($request, $match, $model);
         return $model;
     }
 
