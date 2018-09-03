@@ -294,15 +294,15 @@ return array(
 
     // ************************************************** Accounts (Members) of a Tenant
 
-//     array( // Create
-//         'regex' => '#^/tenants/(?P<parentId>\d+)/members$#',
-//         'model' => 'User_Views_Account',
-//         'method' => 'create',
-//         'http-method' => array(
-//             'PUT',
-//             'POST'
-//         )
-//     ),
+    // array( // Create
+    // 'regex' => '#^/tenants/(?P<parentId>\d+)/members$#',
+    // 'model' => 'User_Views_Account',
+    // 'method' => 'create',
+    // 'http-method' => array(
+    // 'PUT',
+    // 'POST'
+    // )
+    // ),
     array( // Read (list)
         'regex' => '#^/tenants/(?P<parentId>\d+)/members$#',
         'model' => 'Pluf_Views',
@@ -350,6 +350,36 @@ return array(
             'User_Precondition::ownerRequired'
         ),
         'http-method' => 'DELETE'
+    ),
+
+    // ************************************************************ SPA
+    array( // Read (list)
+        'regex' => '#^/tenants/(?P<parentId>\d+)/spas$#',
+        'model' => 'Pluf_Views',
+        'method' => 'findManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'User_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_SPA'
+        )
+    ),
+    array( // Read
+        'regex' => '#^/tenants/(?P<parentId>\d+)/spas/(?P<modelId>\d+)$#',
+        'model' => 'Pluf_Views',
+        'method' => 'getManyToOne',
+        'http-method' => 'GET',
+        'precond' => array(
+            'User_Precondition::ownerRequired'
+        ),
+        'params' => array(
+            'parent' => 'Pluf_Tenant',
+            'parentKey' => 'tenant',
+            'model' => 'SuperTenant_SPA'
+        )
     )
 );
 
