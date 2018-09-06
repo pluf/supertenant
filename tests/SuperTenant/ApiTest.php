@@ -40,9 +40,18 @@ class SuperTenant_Api extends TestCase
      */
     public function testClassInstance()
     {
-        // $c = new CMS_Content();
-        // $this->assertTrue(isset($c));
-        $this->assertTrue(true);
+        $comment = new SuperTenant_Comment();
+        $this->assertTrue(isset($comment), 'SuperTenant_Comment could not be created!');
+        $config = new SuperTenant_Configuration();
+        $this->assertTrue(isset($config), 'SuperTenant_Configuration could not be created!');
+        $invoice = new SuperTenant_Invoice();
+        $this->assertTrue(isset($invoice), 'SuperTenant_Invoice could not be created!');
+        $member = new SuperTenant_Member();
+        $this->assertTrue(isset($member), 'SuperTenant_Member could not be created!');
+        $spa = new SuperTenant_SPA();
+        $this->assertTrue(isset($spa), 'SuperTenant_SPA could not be created!');
+        $ticket = new SuperTenant_Ticket();
+        $this->assertTrue(isset($ticket), 'SuperTenant_Ticket could not be created!');
     }
 }
 
