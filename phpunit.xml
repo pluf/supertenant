@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit colors="true">
 	<testsuites>
+		<testsuite name="Tenant">
+			<directory>tests/SuperTenant/</directory>
+			<directory>tests/SuperTenant_REST/</directory>
+		</testsuite>
 		<testsuite name="Invoices">
 			<directory>tests/Invoices_REST/</directory>
 		</testsuite>
 		<testsuite name="Config">
 			<directory>tests/Config_Template/</directory>
 			<directory>tests/Config_REST/</directory>
-		</testsuite>
-		<testsuite name="Tenant">
-			<directory>tests/SuperTenant/</directory>
-			<directory>tests/SuperTenant_REST/</directory>
 		</testsuite>
 	</testsuites>
 
