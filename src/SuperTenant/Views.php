@@ -43,19 +43,26 @@ class SuperTenant_Views extends Pluf_Views
         }
         $form = Pluf_Shortcuts_GetFormForModel($tenant, $request->REQUEST);
         $tenant = $form->save();
-        
+
         // Init the Tenant
         $m = new Pluf_Migration(Pluf::f('installed_apps'));
         $m->init($tenant);
-        
+
         // TODO: update user api to get user by login directly
         $user = new User_Account();
         $user = $user->getUser('admin');
-        $role = User_Role::getFromString('Pluf.owner');
-        
+
+        $credit = new User_Credential();
+        $credit->setFromFormData(array(
+            'account_id' => $user->id
+        ));
+        $credit->setPassword('admin');
+        $credit->create();
+
         // Set owner
+        $role = User_Role::getFromString('Pluf.owner');
         $user->setAssoc($role);
-        
+
         // install spacs
         $spas = Pluf::f('spas', array());
         if (sizeof($spas) > 0 && class_exists('Spa_Service')) {
@@ -68,7 +75,7 @@ class SuperTenant_Views extends Pluf_Views
                 throw new Pluf_Exception("Impossible to install spas from market.", 5000, $e, 500);
             }
         }
-        
+
         return $tenant;
     }
 }
