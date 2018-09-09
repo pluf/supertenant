@@ -1,5 +1,5 @@
 <?php
-
+Pluf::loadFunction('SuperTenant_Shortcuts_GetTenantFeildProperties');
 /*
  * This file is part of Pluf Framework, a simple PHP Application Framework.
  * Copyright (C) 2010-2020 Phoinex Scholars Co. (http://dpq.co.ir)
