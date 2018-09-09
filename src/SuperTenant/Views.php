@@ -48,6 +48,9 @@ class SuperTenant_Views extends Pluf_Views
         $m = new Pluf_Migration(Pluf::f('installed_apps'));
         $m->init($tenant);
 
+        // TODO: hadi, 97-06-18: create account and credential base on given data by user in request
+        // For example: login, password, list of modules to install and so on.
+        
         // TODO: update user api to get user by login directly
         $user = new User_Account();
         $user = $user->getUser('admin');
