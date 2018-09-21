@@ -63,7 +63,7 @@ class SuperTenant_Views extends Pluf_Views
         $credit->create();
 
         // Set owner
-        $role = User_Role::getFromString('Pluf.owner');
+        $role = User_Role::getFromString('tenant.owner');
         $user->setAssoc($role);
 
         // install spacs
