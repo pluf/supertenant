@@ -66,13 +66,13 @@ class SuperTenant_Views extends Pluf_Views
         $role = User_Role::getFromString('tenant.owner');
         $user->setAssoc($role);
 
-        // install spacs
+        // install SPAcs
         $spas = Pluf::f('spas', array());
-        if (sizeof($spas) > 0 && class_exists('Spa_Service')) {
+        if (sizeof($spas) > 0 && class_exists('Tenant_SpaService')) {
             try {
                 Tenant_Service::setSetting('spa.default', $spas[0]);
                 foreach ($spas as $spa) {
-                    Spa_Service::installFromRepository($spa);
+                    Tenant_SpaService::installFromRepository($spa);
                 }
             } catch (Throwable $e) {
                 throw new Pluf_Exception("Impossible to install spas from market.", 5000, $e, 500);
