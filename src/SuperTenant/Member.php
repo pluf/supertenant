@@ -19,16 +19,16 @@ Pluf::loadFunction('SuperTenant_Shortcuts_GetTenantFeildProperties');
  */
 
 /**
- * Comment data model
- * 
- * @author maso<mostafa.barmshory@dpq.co.ir>
  *
+ * @author hadi <mohammad.hadi.mansouri@dpq.co.ir>
  */
-class SuperTenant_Comment extends Tenant_Comment
+class SuperTenant_Member extends User_Account
 {
 
     /**
-     * @see SuperTenant_Comment::init()
+     * @brief مدل داده‌ای را بارگذاری می‌کند.
+     *
+     * @see User_Account::init()
      */
     function init()
     {
@@ -37,4 +37,24 @@ class SuperTenant_Comment extends Tenant_Comment
         $tenatFeild = SuperTenant_Shortcuts_GetTenantFeildProperties();
         $this->_a['cols'] = array_merge($this->_a['cols'], $tenatFeild);
     }
+
+    /**
+     * Extract information of user and returns it.
+     *
+     * @param string $login
+     * @return SuperTenant_Member user information
+     */
+    public static function getUser($login)
+    {
+        $model = new SuperTenant_Member();
+        $where = 'login = ' . $model->_toDb($login, 'login');
+        $users = $model->getList(array(
+            'filter' => $where
+        ));
+        if ($users === false or count($users) !== 1) {
+            return false;
+        }
+        return $users[0];
+    }
+    
 }

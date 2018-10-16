@@ -1,4 +1,5 @@
 <?php
+Pluf::loadFunction('SuperTenant_Shortcuts_GetTenantFeildProperties');
 /*
  * This file is part of Pluf Framework, a simple PHP Application Framework.
  * Copyright (C) 2010-2020 Phoinex Scholars Co. (http://dpq.co.ir)
@@ -16,36 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-Pluf::loadFunction('Pluf_Shortcuts_GetObjectOr404');
-Pluf::loadFunction('Pluf_Shortcuts_GetFormForModel');
 
 /**
- * لایه نمایش مدیریت گروه‌ها را به صورت پیش فرض ایجاد می‌کند
  *
- * @author maso
+ * @author hadi <mohammad.hadi.mansouri@dpq.co.ir>
  *        
  */
-class Config_Views extends Pluf_Views
+class SuperTenant_SPA extends Tenant_SPA
 {
 
     /**
-     * مقدار یک خصوصیت را تعیین می‌کند.
+     * @brief مدل داده‌ای را بارگذاری می‌کند.
      *
-     * @param Pluf_HTTP_Request $request
-     * @param array $match
+     * @see Tenant_SPA::init()
      */
-    public function get($request, $match)
-    { // Set the default
-        $sql = new Pluf_SQL('`key`=%s', array(
-            $match['key']
-        ));
-        $model = new SuperTenant_Configuration();
-        $model = $model->getOne(array(
-            'filter' => $sql->gen()
-        ));
-        if (! isset($model)) {
-            $model = new SuperTenant_Configuration();
-        }
-        return $model;
+    function init()
+    {
+        parent::init();
+        $this->_a['multitenant'] = false;
+        $tenatFeild = SuperTenant_Shortcuts_GetTenantFeildProperties();
+        $this->_a['cols'] = array_merge($this->_a['cols'], $tenatFeild);
     }
+
 }

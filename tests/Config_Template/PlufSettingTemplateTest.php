@@ -50,19 +50,18 @@ class PlufConfigTemplateTest extends TestCase
         );
         $view->create($request, array());
         
-        
         self::$client = new Test_Client(array(
             array(
                 'app' => 'SuperTenant',
-                'regex' => '#^/api/saas#',
+                'regex' => '#^/api/v2/super-tenant#',
                 'base' => '',
-                'sub' => include 'SuperTenant/urls.php'
+                'sub' => include 'SuperTenant/urls-v2.php'
             ),
             array(
                 'app' => 'User',
-                'regex' => '#^/api/user#',
+                'regex' => '#^/api/v2/user#',
                 'base' => '',
-                'sub' => include 'User/urls.php'
+                'sub' => include 'User/urls-v2.php'
             )
         ));
     }
@@ -113,7 +112,6 @@ class PlufConfigTemplateTest extends TestCase
         $conf = new SuperTenant_Configuration();
         $conf->key = $key;
         $conf->value = $value;
-        $conf->mod = SuperTenant_Configuration::MOD_PUBLIC;
         $conf->tenant = $tenant;
         Test_Assert::assertTrue($conf->create());
         

@@ -1,5 +1,5 @@
 <?php
-
+Pluf::loadFunction('SuperTenant_Shortcuts_GetTenantFeildProperties');
 /*
  * This file is part of Pluf Framework, a simple PHP Application Framework.
  * Copyright (C) 2010-2020 Phoinex Scholars Co. (http://dpq.co.ir)
@@ -35,13 +35,7 @@ class SuperTenant_Invoice extends Tenant_Invoice
     {
         parent::init();
         $this->_a['multitenant'] = false;
-        $this->_a['cols'] = array_merge($this->_a['cols'], array(
-            'tenant' => array(
-                'type' => 'Pluf_DB_Field_Foreignkey',
-                'model' => 'Pluf_Tenant',
-                'blank' => false,
-                'editable' => false
-            )
-        ));
+        $tenatFeild = SuperTenant_Shortcuts_GetTenantFeildProperties();
+        $this->_a['cols'] = array_merge($this->_a['cols'], $tenatFeild);
     }
 }

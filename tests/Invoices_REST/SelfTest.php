@@ -25,6 +25,7 @@ require_once 'Pluf.php';
  */
 class Invoices_REST_SelfTest extends TestCase
 {
+    private static $client = null;
 
     /**
      * @beforeClass
@@ -47,6 +48,27 @@ class Invoices_REST_SelfTest extends TestCase
             'validate' => true
         );
         $view->create($request, array());
+        
+        self::$client = new Test_Client(array(
+            array(
+                'app' => 'SuperTenant',
+                'regex' => '#^/api/v2/super-tenant#',
+                'base' => '',
+                'sub' => include 'SuperTenant/urls-v2.php'
+            ),
+            array(
+                'app' => 'User',
+                'regex' => '#^/api/v2/user#',
+                'base' => '',
+                'sub' => include 'User/urls-v2.php'
+            )
+        ));
+        // login
+        $response = self::$client->post('/api/v2/user/login', array(
+            'login' => 'admin',
+            'password' => 'admin'
+        ));
+        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
     }
 
     /**
@@ -65,34 +87,13 @@ class Invoices_REST_SelfTest extends TestCase
      */
     public function testFindInvoices()
     {
-        $client = new Test_Client(array(
-            array(
-                'app' => 'SuperTenant',
-                'regex' => '#^/api/saas#',
-                'base' => '',
-                'sub' => include 'SuperTenant/urls.php'
-            ),
-            array(
-                'app' => 'User',
-                'regex' => '#^/api/user#',
-                'base' => '',
-                'sub' => include 'User/urls.php'
-            )
-        ));
-        // login
-        $response = $client->post('/api/user/login', array(
-            'login' => 'admin',
-            'password' => 'admin'
-        ));
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
-        
         // Current user is valid
-        $response = $client->get('/api/user');
+        $response = self::$client->get('/api/v2/user/accounts/current');
         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
         Test_Assert::assertResponseNotAnonymousModel($response, 'Current user is anonymous');
         
         // find
-        $response = $client->get('/api/saas/invoice/find');
+        $response = self::$client->get('/api/v2/super-tenant/invoices');
         Test_Assert::assertResponseNotNull($response, 'Find result is empty');
         Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
         Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
@@ -107,29 +108,8 @@ class Invoices_REST_SelfTest extends TestCase
      */
     public function testFindInvoicesNonEmpty()
     {
-        $client = new Test_Client(array(
-            array(
-                'app' => 'SuperTenant',
-                'regex' => '#^/api/saas#',
-                'base' => '',
-                'sub' => include 'SuperTenant/urls.php'
-            ),
-            array(
-                'app' => 'User',
-                'regex' => '#^/api/user#',
-                'base' => '',
-                'sub' => include 'User/urls.php'
-            )
-        ));
-        // login
-        $response = $client->post('/api/user/login', array(
-            'login' => 'admin',
-            'password' => 'admin'
-        ));
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
-        
         // Current user is valid
-        $response = $client->get('/api/user');
+        $response = self::$client->get('/api/v2/user/accounts/current');
         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
         Test_Assert::assertResponseNotAnonymousModel($response, 'Current user is anonymous');
         
@@ -141,7 +121,7 @@ class Invoices_REST_SelfTest extends TestCase
         $i->create();
         
         // find
-        $response = $client->get('/api/saas/invoice/find');
+        $response = self::$client->get('/api/v2/super-tenant/invoices');
         Test_Assert::assertResponseNotNull($response, 'Find result is empty');
         Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
         Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
@@ -158,29 +138,8 @@ class Invoices_REST_SelfTest extends TestCase
      */
     public function testGetInvoice()
     {
-        $client = new Test_Client(array(
-            array(
-                'app' => 'SuperTenant',
-                'regex' => '#^/api/saas#',
-                'base' => '',
-                'sub' => include 'SuperTenant/urls.php'
-            ),
-            array(
-                'app' => 'User',
-                'regex' => '#^/api/user#',
-                'base' => '',
-                'sub' => include 'User/urls.php'
-            )
-        ));
-        // login
-        $response = $client->post('/api/user/login', array(
-            'login' => 'admin',
-            'password' => 'admin'
-        ));
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
-        
         // Current user is valid
-        $response = $client->get('/api/user');
+        $response = self::$client->get('/api/v2/user/accounts/current');
         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
         Test_Assert::assertResponseNotAnonymousModel($response, 'Current user is anonymous');
         
@@ -192,7 +151,7 @@ class Invoices_REST_SelfTest extends TestCase
         $i->create();
         
         // find
-        $response = $client->get('/api/saas/invoice/' . $i->id);
+        $response = self::$client->get('/api/v2/super-tenant/invoices/' . $i->id);
         Test_Assert::assertResponseNotNull($response);
         Test_Assert::assertResponseStatusCode($response, 200);
         Test_Assert::assertResponseNotAnonymousModel($response, 'Invoice not foudn');

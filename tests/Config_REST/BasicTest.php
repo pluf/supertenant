@@ -54,15 +54,15 @@ class Config_REST_BasicTest extends TestCase
         self::$client = new Test_Client(array(
             array(
                 'app' => 'SuperTenant',
-                'regex' => '#^/api/saas#',
+                'regex' => '#^/api/v2/super-tenant#',
                 'base' => '',
-                'sub' => include 'SuperTenant/urls.php'
+                'sub' => include 'SuperTenant/urls-v2.php'
             ),
             array(
                 'app' => 'User',
-                'regex' => '#^/api/user#',
+                'regex' => '#^/api/v2/user#',
                 'base' => '',
-                'sub' => include 'User/urls.php'
+                'sub' => include 'User/urls-v2.php'
             )
         ));
     }
@@ -82,13 +82,13 @@ class Config_REST_BasicTest extends TestCase
     public function listSystemConfiguration()
     {
         // login
-        $response = self::$client->post('/api/user/login', array(
+        $response = self::$client->post('/api/v2/user/login', array(
             'login' => 'admin',
             'password' => 'admin'
         ));
         Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
         
-        $response = self::$client->get('/api/saas/config/find');
+        $response = self::$client->get('/api/v2/super-tenant/configurations');
         Test_Assert::assertResponseNotNull($response, 'Find result is empty');
         Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
         Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');

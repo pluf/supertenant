@@ -1,8 +1,6 @@
 {
 	"name": "SuperTenant",
-	"version": "3.0",
+	"version": "4.0.0",
 	"title": "Tenant management system",
-	"model": [
-		"SuperTenant_Configuration"
-	]
+	"model": []
 }
