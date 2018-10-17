@@ -1,4 +1,4 @@
-<?php
+// <?php
 /*
  * This file is part of Pluf Framework, a simple PHP Application Framework.
  * Copyright (C) 2010-2020 Phoinex Scholars Co. (http://dpq.co.ir)
@@ -25,8 +25,10 @@ set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . '/../Base/');
  * @backupGlobals disabled
  * @backupStaticAttributes disabled
  */
-class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
+class SuperTenant_REST_TicketCommentAnonymouseTest extends AbstractBasicTest
 {
+
+    private static $client = null;
 
     private static $ownerClient = null;
 
@@ -37,8 +39,8 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
     public static function installApps()
     {
         parent::installApps();
-        // Owner client
-        self::$ownerClient = new Test_Client(array(
+        // Anonymouse client
+        self::$client = new Test_Client(array(
             array(
                 'app' => 'SuperTenant',
                 'regex' => '#^/api/v2/super-tenant#',
@@ -52,22 +54,20 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
                 'sub' => include 'User/urls-v2.php'
             )
         ));
-        // login
-        $response = self::$ownerClient->post('/api/v2/user/login', array(
-            'login' => 'test',
-            'password' => 'test'
-        ));
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
+        // logout (to ensure user is anonymouse
+        $response = self::$client->post('/api/v2/user/logout');
+        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to logout');
     }
 
     /**
-     * Getting tenant tickets
+     * Getting comments of ticket
      *
-     * Call tenant to get list of tickets
+     * Call tenant to get list of comments of ticket
      *
      * @test
+     * @expectedException Pluf_Exception_Unauthorized
      */
-    public function testFindTicketComments()
+    public function testListEmptyTicketComments()
     {
         // Create ticket
         $user = new User_Account();
@@ -81,21 +81,22 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $t->requester_id = $user;
         $t->create();
 
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
-
+        // Anonymouse access (Expect to exception)
+        self::$client->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
+        
         // delete
         $t->delete();
     }
-
+    
     /**
-     * Getting not empty comments
+     * Getting tenant tickets (when list is not empty)
+     *
+     * Call tenant to get list of tickets
      *
      * @test
+     * @expectedException Pluf_Exception_Unauthorized
      */
-    public function testFindTicketCommentsNotEmpty()
+    public function testListNotEmptyTicketComments()
     {
         // Create ticket
         $user = new User_Account();
@@ -115,13 +116,10 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $c->author_id = $user;
         $c->ticket_id = $t;
         $c->create();
-
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseNonEmptyPaginateList($response);
-
+        
+        // Anonymouse access (Expect to exception)
+        self::$client->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
+        
         // delete
         $c->delete();
         $t->delete();
@@ -131,6 +129,7 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
      * Getting comment
      *
      * @test
+     * @expectedException Pluf_Exception_Unauthorized
      */
     public function testGetTicketComment()
     {
@@ -153,11 +152,8 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $c->ticket_id = $t;
         $c->create();
 
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments/' . $c->id);
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponseAsModel($response);
-        Test_Assert::assertResponseNotAnonymousModel($response);
+        // Anonymouse access (Expect to exception)
+        self::$client->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments/' . $c->id);
 
         // delete
         $c->delete();
@@ -168,6 +164,7 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
      * Creating comment
      *
      * @test
+     * @expectedException Pluf_Exception_Unauthorized
      */
     public function testCreateTicketComment()
     {
@@ -183,23 +180,12 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $t->requester_id = $user;
         $t->create();
 
-        $response = self::$ownerClient->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments', array(
+        // Anonymouse access (Expect to exception)
+        self::$client->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments', array(
             'title' => 'test',
             'description' => 'test'
         ));
-        Test_Assert::assertResponseStatusCode($response, 200);
-        $tc = json_decode($response->content, true);
 
-        // find comments
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseNonEmptyPaginateList($response);
-
-        // delete
-        $c = new Tenant_Comment($tc['id']);
-        $c->delete();
         $t->delete();
     }
 
@@ -207,6 +193,7 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
      * Creating comment
      *
      * @test
+     * @expectedException Pluf_Exception_Unauthorized
      */
     public function testUpdateTicketComment()
     {
@@ -222,30 +209,20 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $t->requester_id = $user;
         $t->create();
 
-        // Create
-        $response = self::$ownerClient->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments', array(
-            'title' => 'test',
-            'description' => 'test'
-        ));
-        Test_Assert::assertResponseStatusCode($response, 200);
-        $tc = json_decode($response->content, true);
-
-        // update
-        $response = self::$ownerClient->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments/' . $tc['id'], array(
+        $c = new Tenant_Comment();
+        $c->title = 'test';
+        $c->description = 'test';
+        $c->author_id = $user;
+        $c->ticket_id = $t;
+        $c->create();
+        
+        // Anonymouse access (Expect to exception)
+        self::$client->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments/'. $c->id, array(
             'title' => 'test new title',
             'description' => 'test'
         ));
-        Test_Assert::assertResponseStatusCode($response, 200);
-
-        // find comments
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseNonEmptyPaginateList($response);
 
         // delete
-        $c = new Tenant_Comment($tc['id']);
         $c->delete();
         $t->delete();
     }
@@ -254,6 +231,7 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
      * Creating comment
      *
      * @test
+     * @expectedException Pluf_Exception_Unauthorized
      */
     public function testDeleteTicketComment()
     {
@@ -269,26 +247,19 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $t->requester_id = $user;
         $t->create();
 
-        // create
-        $response = self::$ownerClient->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments', array(
-            'title' => 'test',
-            'description' => 'test'
-        ));
-        Test_Assert::assertResponseStatusCode($response, 200);
+        $c = new Tenant_Comment();
+        $c->title = 'test';
+        $c->description = 'test';
+        $c->author_id = $user;
+        $c->ticket_id = $t;
+        $c->create();
         
-        $tc = json_decode($response->content, true);
         // delete
-        $response = self::$ownerClient->delete('/api/v2/super-tenant/tickets/' . $t->id . '/comments/' . $tc['id']);
-        Test_Assert::assertResponseStatusCode($response, 200);
-
-        // 
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseEmptyPaginateList($response);
+        // Anonymouse access (Expect to exception)
+        self::$client->delete('/api/v2/super-tenant/tickets/' . $t->id . '/comments/' . $c->id);
 
         // delete
+        $c->delete();
         $t->delete();
     }
 }
