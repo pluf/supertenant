@@ -17,11 +17,11 @@
 	],
 	"minimum-stability" : "stable",
 	"require" : {
-		"pluf/tenant" : "5.5.x",
-		"pluf/user" : "5.5.x"
+		"pluf/tenant" : "5.6.x",
+		"pluf/user" : "5.6.x"
 	},
 	"require-dev" : {
-		"pluf/test" : "5.5.x"
+		"pluf/test" : "5.6.x"
 	},
 	"include-path" : [
 		"src/"
