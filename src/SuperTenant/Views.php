@@ -70,9 +70,11 @@ class SuperTenant_Views extends Pluf_Views
         $spas = Pluf::f('spas', array());
         if (sizeof($spas) > 0 && class_exists('Tenant_SpaService')) {
             try {
+                Pluf::loadFunction('Tenant_Shortcuts_SpaManager');
                 Tenant_Service::setSetting('spa.default', $spas[0]);
                 foreach ($spas as $spa) {
-                    Tenant_SpaService::installFromRepository($spa);
+                    $myspa = Tenant_SpaService::installFromRepository($spa);
+                    Tenant_Shortcuts_SpaManager($myspa)->apply($myspa, 'create');
                 }
             } catch (Throwable $e) {
                 throw new Pluf_Exception("Impossible to install spas from market.", 5000, $e, 500);
