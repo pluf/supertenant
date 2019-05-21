@@ -17,6 +17,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 return array(
+    // ************************************************************* Schema
+    array(
+        'regex' => '#^/tenants/schema$#',
+        'model' => 'Pluf_Views',
+        'method' => 'getSchema',
+        'http-method' => 'GET',
+        'params' => array(
+            'model' => 'Pluf_Tenant'
+        )
+    ),
     // **************************************************************** Tenant
     array( // Create
         'regex' => '#^/tenants$#',

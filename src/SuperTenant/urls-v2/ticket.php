@@ -1,5 +1,15 @@
 <?php
 return array(
+    // ************************************************************* Schema
+    array(
+        'regex' => '#^/tickets/schema$#',
+        'model' => 'Pluf_Views',
+        'method' => 'getSchema',
+        'http-method' => 'GET',
+        'params' => array(
+            'model' => 'SuperTenant_Ticket'
+        )
+    ),
     // **************************************************************** Ticket
     array( // Read (list)
         'regex' => '#^/tickets$#',
