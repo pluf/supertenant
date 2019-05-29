@@ -38,9 +38,16 @@ class SuperTenant_Views extends Pluf_Views
     {
         // Create a tenant
         $tenant = new Pluf_Tenant();
+
+        // Validate subdomain if requester is not owner of tenant
+        if (! User_Precondition::isOwner($request)) {
+            $this->validateSubdomain($request->REQUEST['subdomain']);
+        }
+        // Set domain from subdomain if domain is not set in the request
         if (! isset($request->REQUEST['domain'])) {
             $request->REQUEST['domain'] = $request->REQUEST['subdomain'] . '.' . Pluf::f('general_domain', 'pluf.ir');
         }
+
         $form = Pluf_Shortcuts_GetFormForModel($tenant, $request->REQUEST);
         $tenant = $form->save();
 
@@ -50,7 +57,7 @@ class SuperTenant_Views extends Pluf_Views
 
         // TODO: hadi, 97-06-18: create account and credential base on given data by user in request
         // For example: login, password, list of modules to install and so on.
-        
+
         // TODO: update user api to get user by login directly
         $user = new User_Account();
         $user = $user->getUser('admin');
@@ -83,4 +90,25 @@ class SuperTenant_Views extends Pluf_Views
 
         return $tenant;
     }
+
+    /**
+     * Checks if given subdomain is valid.
+     *
+     * A name for subdomain is valid if its lenght is at least `subdomain_min_length` characters and is not equal with reserved subdomains.
+     * The value `subdomain_min_length` is set from config.php.
+     * Also, the array of reserved subdomains is set from config.php by a key named 'reserved_subdomains'.
+     */
+    public function validateSubdomain($subdomain)
+    {
+        $minLength = Pluf::f('subdomain_min_length', 1);
+        if (strlen($subdomain) < $minLength) {
+            throw new Pluf_Exception_BadRequest('Invalid subdomain. Subdomain should be at least ' . $minLength . ' character.');
+        }
+        $reservedSubdomains = Pluf::f('reserved_subdomains', array());
+        if (in_array($subdomain, $reservedSubdomains, TRUE)) {
+            throw new Pluf_Exception_BadRequest('Subdomain is reserved.');
+        }
+    }
 }
+
+

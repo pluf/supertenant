@@ -23,7 +23,7 @@ require_once 'Pluf.php';
  * @backupGlobals disabled
  * @backupStaticAttributes disabled
  */
-class SuperTenant_REST_TenantTest extends TestCase
+class SuperTenant_REST_AnonymousClientTest extends TestCase
 {
 
     private static $client = null;
@@ -107,85 +107,7 @@ class SuperTenant_REST_TenantTest extends TestCase
     }
 
     /**
-     * login
-     *
-     * @before
-     */
-    public function loginWithTestUser()
-    {
-        $response = self::$client->post('/api/v2/user/login', array(
-            'login' => 'test',
-            'password' => 'test'
-        ));
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
-    }
-
-    /**
-     * Logout
-     *
-     * @after
-     */
-    public function logoutUser()
-    {
-        $response = self::$client->post('/api/v2/user/logout');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
-    }
-
-    /**
-     * Getting tenant tickets
-     *
-     * Call tenant to get list of tickets
-     *
-     * @test
-     */
-    public function testFindTenants()
-    {
-        // find comments
-        $flag = true;
-        while ($flag) {
-            $response = self::$client->get('/api/v2/super-tenant/tenants');
-            Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-            Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-            Test_Assert::assertResponsePaginateList($response);
-            $this->logoutUser();
-            $flag = false;
-        }
-    }
-
-    /**
-     * Getting not empety comments
-     *
-     * @test
-     */
-    public function testFindTenantNotEmpty()
-    {
-        // Create ticket
-        $t = new Pluf_Tenant();
-        $t->title = 'test';
-        $t->description = 'test';
-        $t->domain = 'test' . rand();
-        $t->subdomain = 'test' . rand() . '.localhost';
-        $t->validate = true;
-        $t->create();
-        
-        // find comments
-        $flag = true;
-        while ($flag) {
-            $response = self::$client->get('/api/v2/super-tenant/tenants');
-            Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-            Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-            Test_Assert::assertResponsePaginateList($response);
-            Test_Assert::assertResponseNonEmptyPaginateList($response);
-            $this->logoutUser();
-            $flag = false;
-        }
-        
-        // delete
-        $t->delete();
-    }
-
-    /**
-     * Getting tenant info
+     * Anonymous access to tenant info
      *
      * Call tenant to get current tenant information.
      *
@@ -222,13 +144,13 @@ class SuperTenant_REST_TenantTest extends TestCase
 
     /**
      * Creating tenant
-     * Owner could create tenant with too short subdomain
      *
      * @test
      */
-    public function testTooShortSubdomainByOwner()
+    public function testValidateTooShortSubdomain()
     {
         $testSubdomain = 'abc';
+        $this->expectException(Pluf_Exception_BadRequest::class);
         // new tenant with too short subdomain
         $response = self::$client->post('/api/v2/super-tenant/tenants', array(
             'title' => 'test',
@@ -237,18 +159,18 @@ class SuperTenant_REST_TenantTest extends TestCase
             'subdomain' => $testSubdomain
         ));
         $this->assertNotNull($response);
-        $this->assertEquals($response->status_code, 200);
+        $this->assertNotEquals($response->status_code, 200);
     }
     
     /**
      * Creating tenant
-     * Owner could create tenant with reserved subdomain
      *
      * @test
      */
-    public function testReservedSubdomainByOwner()
+    public function testValidateReservedSubdomain()
     {
         $testSubdomain = 'reserved';
+        $this->expectException(Pluf_Exception_BadRequest::class);
         // new tenant with reserved subdomain
         $response = self::$client->post('/api/v2/super-tenant/tenants', array(
             'title' => 'test',
@@ -257,7 +179,7 @@ class SuperTenant_REST_TenantTest extends TestCase
             'subdomain' => $testSubdomain
         ));
         $this->assertNotNull($response);
-        $this->assertEquals($response->status_code, 200);
+        $this->assertNotEquals($response->status_code, 200);
     }
     
     /**
@@ -267,10 +189,10 @@ class SuperTenant_REST_TenantTest extends TestCase
      */
     public function testGetTenantTickets()
     {
+        $this->expectException(Pluf_Exception_Unauthorized::class);
         $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/tickets');
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponsePaginateList($response);
+        $this->assertNotNull($response);
+        $this->assertNotEquals($response->status_code, 200);
     }
 
     /**
@@ -280,25 +202,14 @@ class SuperTenant_REST_TenantTest extends TestCase
      */
     public function testCreateTenantTickets()
     {
+        $this->expectException(Pluf_Exception_Unauthorized::class);
         $response = self::$client->post('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/tickets', array(
             'type' => 'bug',
             'subject' => 'test ticket',
             'description' => 'it is not possible to test'
         ));
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponseNotAnonymousModel($response);
-        $t = json_decode($response->content, true);
-        
-        $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/tickets');
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseNonEmptyPaginateList($response);
-        
-        $obj = new SuperTenant_Ticket($t['id']);
-        Test_Assert::assertFalse($obj->isAnonymous());
-        $obj->delete();
+        $this->assertNotNull($response);
+        $this->assertNotEquals($response->status_code, 200);
     }
 
     /**
@@ -308,10 +219,10 @@ class SuperTenant_REST_TenantTest extends TestCase
      */
     public function testGetTenantiInvoice()
     {
+        $this->expectException(Pluf_Exception_Unauthorized::class);
         $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/invoices');
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponsePaginateList($response);
+        $this->assertNotNull($response);
+        $this->assertNotEquals($response->status_code, 200);
     }
 
     /**
@@ -321,26 +232,15 @@ class SuperTenant_REST_TenantTest extends TestCase
      */
     public function testCreateTenantInvoce()
     {
+        $this->expectException(Pluf_Exception_Unauthorized::class);
         $response = self::$client->post('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/invoices', array(
             'amount' => 1000,
             'title' => 'test ticket',
             'description' => 'it is not possible to test',
             'due_dtime' => gmdate('Y-m-d H:i:s')
         ));
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponseNotAnonymousModel($response);
-        $t = json_decode($response->content, true);
-        
-        $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/invoices');
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseNonEmptyPaginateList($response);
-        
-        $obj = new SuperTenant_Invoice($t['id']);
-        Test_Assert::assertFalse($obj->isAnonymous());
-        $obj->delete();
+        $this->assertNotNull($response);
+        $this->assertNotEquals($response->status_code, 200);
     }
 }
 

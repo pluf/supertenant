@@ -1,5 +1,15 @@
 <?php
 return array(
+    // ************************************************************* Schema
+    array(
+        'regex' => '#^/invoices/schema$#',
+        'model' => 'Pluf_Views',
+        'method' => 'getSchema',
+        'http-method' => 'GET',
+        'params' => array(
+            'model' => 'SuperTenant_Invoice'
+        )
+    ),
     // **************************************************************** Invoice
     array( // Read (all)
         'regex' => '#^/invoices$#',
