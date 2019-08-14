@@ -47,6 +47,10 @@ class SuperTenant_Views extends Pluf_Views
         if (! isset($request->REQUEST['domain'])) {
             $request->REQUEST['domain'] = $request->REQUEST['subdomain'] . '.' . Pluf::f('general_domain', 'pluf.ir');
         }
+        // Set current tenant as the parent tenant
+        $tenant->_a['cols']['parent_id']['editable'] = true;
+        $currentTenant = Pluf_Tenant::current();
+        $request->REQUEST['parent_id'] = $currentTenant->id;
 
         $form = Pluf_Shortcuts_GetFormForModel($tenant, $request->REQUEST);
         $tenant = $form->save();
