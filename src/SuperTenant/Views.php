@@ -36,62 +36,11 @@ class SuperTenant_Views extends Pluf_Views
      */
     public function create($request, $match)
     {
-        // Create a tenant
-        $tenant = new Pluf_Tenant();
-
         // Validate subdomain if requester is not owner of tenant
         if (! User_Precondition::isOwner($request)) {
             $this->validateSubdomain($request->REQUEST['subdomain']);
         }
-        // Set domain from subdomain if domain is not set in the request
-        if (! isset($request->REQUEST['domain'])) {
-            $request->REQUEST['domain'] = $request->REQUEST['subdomain'] . '.' . Pluf::f('general_domain', 'pluf.ir');
-        }
-        // Set current tenant as the parent tenant
-        $tenant->_a['cols']['parent_id']['editable'] = true;
-        $currentTenant = Pluf_Tenant::current();
-        $request->REQUEST['parent_id'] = $currentTenant->id;
-
-        $form = Pluf_Shortcuts_GetFormForModel($tenant, $request->REQUEST);
-        $tenant = $form->save();
-
-        // Init the Tenant
-        $m = new Pluf_Migration(Pluf::f('installed_apps'));
-        $m->init($tenant);
-
-        // TODO: hadi, 97-06-18: create account and credential base on given data by user in request
-        // For example: login, password, list of modules to install and so on.
-
-        // TODO: update user api to get user by login directly
-        $user = new User_Account();
-        $user = $user->getUser('admin');
-
-        $credit = new User_Credential();
-        $credit->setFromFormData(array(
-            'account_id' => $user->id
-        ));
-        $credit->setPassword('admin');
-        $credit->create();
-
-        // Set owner
-        $role = User_Role::getFromString('tenant.owner');
-        $user->setAssoc($role);
-
-        // install SPAcs
-        $spas = Pluf::f('spas', array());
-        if (sizeof($spas) > 0 && class_exists('Tenant_SpaService')) {
-            try {
-                Pluf::loadFunction('Tenant_Shortcuts_SpaManager');
-                Tenant_Service::setSetting('spa.default', $spas[0]);
-                foreach ($spas as $spa) {
-                    $myspa = Tenant_SpaService::installFromRepository($spa);
-                    Tenant_Shortcuts_SpaManager($myspa)->apply($myspa, 'create');
-                }
-            } catch (Throwable $e) {
-                throw new Pluf_Exception("Impossible to install spas from market.", 5000, $e, 500);
-            }
-        }
-
+        $tenant = Tenant_Service::createNewTenant($request->REQUEST);
         return $tenant;
     }
 
