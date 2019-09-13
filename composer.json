@@ -26,13 +26,13 @@
 	"include-path" : [
 		"src/"
 	],
-	"homepage" : "https://github.com/pluf/cache",
+	"homepage" : "https://github.com/pluf/supertenant",
 	"support" : {
 		"email" : "info@pluf.ir",
-		"issues" : "https://github.com/pluf/cms/issues",
-		"forum" : "https://github.com/pluf/cms",
-		"wiki" : "https://github.com/pluf/cms/wiki",
-		"source" : "https://github.com/pluf/cms"
+		"issues" : "https://github.com/pluf/supertenant/issues",
+		"forum" : "https://github.com/pluf/supertenant",
+		"wiki" : "https://github.com/pluf/supertenant/wiki",
+		"source" : "https://github.com/pluf/supertenant"
 	},
 	"keywords" : [
 		"pluf",

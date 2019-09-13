@@ -2,5 +2,43 @@
 	"name": "SuperTenant",
 	"version": "4.0.0",
 	"title": "Tenant management system",
-	"model": []
+	"model": [],
+	"init": {
+		"Monitor_Tag": [
+			{
+				"name": "supertenant",
+				"description": "Tag for monitors on SuperTenant metrics"
+			}
+		],
+		"Monitor_Metric": [
+			{
+				"name": "supertenant.tenant.count",
+				"title": "Number of tenants",
+				"description": "Defines number of tenants created on the server.",
+				"function": "SuperTenant_Monitor::tenantsCount",
+				"cacheable": true,
+				"interval": 60
+			},
+			{
+				"name": "supertenant.member.count",
+				"title": "Number of members",
+				"description": "Defines total number of members existed on the all tenants created on the server.",
+				"function": "SuperTenant_Monitor::membersCount",
+				"cacheable": true,
+				"interval": 60
+			}
+		]
+	},
+	"init_assoc": {
+		"Monitor_Tag|Monitor_Metric": [
+			{
+				"from": "name='supertenant'",
+				"to": "name='supertenant.tenant.count'"
+			},
+			{
+				"from": "name='supertenant'",
+				"to": "name='supertenant.member.count'"
+			}
+		]
+	}
 }
