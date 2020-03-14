@@ -16,10 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use PHPUnit\Framework\TestCase;
+use Pluf\Test\Client;
+use Pluf\Test\TestCase;
 require_once 'Pluf.php';
 
 /**
+ *
  * @backupGlobals disabled
  * @backupStaticAttributes disabled
  */
@@ -33,17 +35,20 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
     private static $user = null;
 
     /**
+     *
      * @beforeClass
      */
     public static function installApps()
     {
-        $config = include(__DIR__ . '/../conf/config.php');
+        $config = include (__DIR__ . '/../conf/config.php');
         $config['subdomain_min_length'] = 5;
-        $config['reserved_subdomains'] = array('reserved');
+        $config['reserved_subdomains'] = array(
+            'reserved'
+        );
         Pluf::start($config);
-        $m = new Pluf_Migration(Pluf::f('installed_apps'));
+        $m = new Pluf_Migration();
         $m->install();
-        
+
         // Test tenant
         $tenant = new Pluf_Tenant();
         $tenant->domain = 'localhost';
@@ -52,14 +57,12 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
         if (true !== $tenant->create()) {
             throw new Pluf_Exception('Faile to create new tenant');
         }
-        
+
         $m->init($tenant);
         self::$tenant = $tenant;
-        
-        if (! isset($GLOBALS['_PX_request'])) {
-            $GLOBALS['_PX_request'] = new Pluf_HTTP_Request('/');
-        }
-        $GLOBALS['_PX_request']->tenant = $tenant;
+
+        Pluf_HTTP_Request::setCurrent(new Pluf_HTTP_Request('/'));
+        Pluf_Tenant::setCurrent($tenant);
         
         $user = new User_Account();
         $user->login = 'test';
@@ -76,33 +79,21 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
         if (true !== $credit->create()) {
             throw new Exception();
         }
-        
+
         $per = User_Role::getFromString('tenant.owner');
         $user->setAssoc($per);
         self::$user = $user;
-        
-        self::$client = new Test_Client(array(
-            array(
-                'app' => 'SuperTenant',
-                'regex' => '#^/api/v2/super-tenant#',
-                'base' => '',
-                'sub' => include 'SuperTenant/urls-v2.php'
-            ),
-            array(
-                'app' => 'User',
-                'regex' => '#^/api/v2/user#',
-                'base' => '',
-                'sub' => include 'User/urls-v2.php'
-            )
-        ));
+
+        self::$client = new Client();
     }
 
     /**
+     *
      * @afterClass
      */
     public static function uninstallApps()
     {
-        $m = new Pluf_Migration(Pluf::f('installed_apps'));
+        $m = new Pluf_Migration();
         $m->unInstall();
     }
 
@@ -115,9 +106,9 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
      */
     public function testGetTenant()
     {
-        $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id);
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
+        $response = self::$client->get('/supertenant/tenants/' . self::$tenant->id);
+        $this->assertResponseNotNull($response);
+        $this->assertResponseStatusCode($response, 200);
     }
 
     /**
@@ -129,15 +120,15 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
     {
         $testSubdomain = 'test' . rand();
         // find comments
-        $response = self::$client->post('/api/v2/super-tenant/tenants', array(
+        $response = self::$client->post('/supertenant/tenants', array(
             'title' => 'test',
             'description' => 'test',
             'domain' => $testSubdomain . '.local',
             'subdomain' => $testSubdomain
         ));
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponseNotAnonymousModel($response);
-        
+        $this->assertResponseStatusCode($response, 200);
+        $this->assertResponseNotAnonymousModel($response);
+
         $tenant = Pluf_Tenant::bySubDomain($testSubdomain);
         $tenant->delete();
     }
@@ -152,7 +143,7 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
         $testSubdomain = 'abc';
         $this->expectException(Pluf_Exception_BadRequest::class);
         // new tenant with too short subdomain
-        $response = self::$client->post('/api/v2/super-tenant/tenants', array(
+        $response = self::$client->post('/supertenant/tenants', array(
             'title' => 'test',
             'description' => 'test',
             'domain' => $testSubdomain . '.local',
@@ -161,7 +152,7 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
         $this->assertNotNull($response);
         $this->assertNotEquals($response->status_code, 200);
     }
-    
+
     /**
      * Creating tenant
      *
@@ -172,7 +163,7 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
         $testSubdomain = 'reserved';
         $this->expectException(Pluf_Exception_BadRequest::class);
         // new tenant with reserved subdomain
-        $response = self::$client->post('/api/v2/super-tenant/tenants', array(
+        $response = self::$client->post('/supertenant/tenants', array(
             'title' => 'test',
             'description' => 'test',
             'domain' => $testSubdomain . '.local',
@@ -181,7 +172,7 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
         $this->assertNotNull($response);
         $this->assertNotEquals($response->status_code, 200);
     }
-    
+
     /**
      * Getting tenant ticket
      *
@@ -190,7 +181,7 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
     public function testGetTenantTickets()
     {
         $this->expectException(Pluf_Exception_Unauthorized::class);
-        $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/tickets');
+        $response = self::$client->get('/supertenant/tenants/' . self::$tenant->id . '/tickets');
         $this->assertNotNull($response);
         $this->assertNotEquals($response->status_code, 200);
     }
@@ -203,7 +194,7 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
     public function testCreateTenantTickets()
     {
         $this->expectException(Pluf_Exception_Unauthorized::class);
-        $response = self::$client->post('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/tickets', array(
+        $response = self::$client->post('/supertenant/tenants/' . self::$tenant->id . '/tickets', array(
             'type' => 'bug',
             'subject' => 'test ticket',
             'description' => 'it is not possible to test'
@@ -220,7 +211,7 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
     public function testGetTenantiInvoice()
     {
         $this->expectException(Pluf_Exception_Unauthorized::class);
-        $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/invoices');
+        $response = self::$client->get('/supertenant/tenants/' . self::$tenant->id . '/invoices');
         $this->assertNotNull($response);
         $this->assertNotEquals($response->status_code, 200);
     }
@@ -233,7 +224,7 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
     public function testCreateTenantInvoce()
     {
         $this->expectException(Pluf_Exception_Unauthorized::class);
-        $response = self::$client->post('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/invoices', array(
+        $response = self::$client->post('/supertenant/tenants/' . self::$tenant->id . '/invoices', array(
             'amount' => 1000,
             'title' => 'test ticket',
             'description' => 'it is not possible to test',

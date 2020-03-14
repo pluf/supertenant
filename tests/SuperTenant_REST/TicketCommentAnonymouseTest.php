@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+use Pluf\Test\Client;
+
 require_once 'Pluf.php';
 
 set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . '/../Base/');
@@ -40,23 +42,10 @@ class SuperTenant_REST_TicketCommentAnonymouseTest extends AbstractBasicTest
     {
         parent::installApps();
         // Anonymouse client
-        self::$client = new Test_Client(array(
-            array(
-                'app' => 'SuperTenant',
-                'regex' => '#^/api/v2/super-tenant#',
-                'base' => '',
-                'sub' => include 'SuperTenant/urls-v2.php'
-            ),
-            array(
-                'app' => 'User',
-                'regex' => '#^/api/v2/user#',
-                'base' => '',
-                'sub' => include 'User/urls-v2.php'
-            )
-        ));
+        self::$client = new Client();
         // logout (to ensure user is anonymouse
-        $response = self::$client->post('/api/v2/user/logout');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to logout');
+        $response = self::$client->post('/user/logout');
+        self::assertResponseStatusCode($response, 200, 'Fail to logout');
     }
 
     /**
@@ -82,12 +71,12 @@ class SuperTenant_REST_TicketCommentAnonymouseTest extends AbstractBasicTest
         $t->create();
 
         // Anonymouse access (Expect to exception)
-        self::$client->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        
+        self::$client->get('/supertenant/tickets/' . $t->id . '/comments');
+
         // delete
         $t->delete();
     }
-    
+
     /**
      * Getting tenant tickets (when list is not empty)
      *
@@ -116,10 +105,10 @@ class SuperTenant_REST_TicketCommentAnonymouseTest extends AbstractBasicTest
         $c->author_id = $user;
         $c->ticket_id = $t;
         $c->create();
-        
+
         // Anonymouse access (Expect to exception)
-        self::$client->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        
+        self::$client->get('/supertenant/tickets/' . $t->id . '/comments');
+
         // delete
         $c->delete();
         $t->delete();
@@ -153,7 +142,7 @@ class SuperTenant_REST_TicketCommentAnonymouseTest extends AbstractBasicTest
         $c->create();
 
         // Anonymouse access (Expect to exception)
-        self::$client->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments/' . $c->id);
+        self::$client->get('/supertenant/tickets/' . $t->id . '/comments/' . $c->id);
 
         // delete
         $c->delete();
@@ -181,7 +170,7 @@ class SuperTenant_REST_TicketCommentAnonymouseTest extends AbstractBasicTest
         $t->create();
 
         // Anonymouse access (Expect to exception)
-        self::$client->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments', array(
+        self::$client->post('/supertenant/tickets/' . $t->id . '/comments', array(
             'title' => 'test',
             'description' => 'test'
         ));
@@ -215,9 +204,9 @@ class SuperTenant_REST_TicketCommentAnonymouseTest extends AbstractBasicTest
         $c->author_id = $user;
         $c->ticket_id = $t;
         $c->create();
-        
+
         // Anonymouse access (Expect to exception)
-        self::$client->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments/'. $c->id, array(
+        self::$client->post('/supertenant/tickets/' . $t->id . '/comments/' . $c->id, array(
             'title' => 'test new title',
             'description' => 'test'
         ));
@@ -253,10 +242,10 @@ class SuperTenant_REST_TicketCommentAnonymouseTest extends AbstractBasicTest
         $c->author_id = $user;
         $c->ticket_id = $t;
         $c->create();
-        
+
         // delete
         // Anonymouse access (Expect to exception)
-        self::$client->delete('/api/v2/super-tenant/tickets/' . $t->id . '/comments/' . $c->id);
+        self::$client->delete('/supertenant/tickets/' . $t->id . '/comments/' . $c->id);
 
         // delete
         $c->delete();

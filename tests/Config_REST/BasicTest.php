@@ -16,13 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use PHPUnit\Framework\TestCase;
-require_once 'Pluf.php';
+use Pluf\Test\Client;
+use Pluf\Test\TestCase;
 
-/**
- * @backupGlobals disabled
- * @backupStaticAttributes disabled
- */
 class Config_REST_BasicTest extends TestCase
 {
 
@@ -31,14 +27,15 @@ class Config_REST_BasicTest extends TestCase
     private static $user = null;
 
     /**
+     *
      * @beforeClass
      */
     public static function createDataBase()
     {
         Pluf::start(__DIR__ . '/../conf/config.php');
-        $m = new Pluf_Migration(Pluf::f('installed_apps'));
+        $m = new Pluf_Migration();
         $m->install();
-        
+
         $view = new SuperTenant_Views();
         $request = new Pluf_HTTP_Request('/');
         $request->tenant = new Pluf_Tenant(1);
@@ -50,47 +47,36 @@ class Config_REST_BasicTest extends TestCase
             'validate' => true
         );
         $view->create($request, array());
-        
-        self::$client = new Test_Client(array(
-            array(
-                'app' => 'SuperTenant',
-                'regex' => '#^/api/v2/super-tenant#',
-                'base' => '',
-                'sub' => include 'SuperTenant/urls-v2.php'
-            ),
-            array(
-                'app' => 'User',
-                'regex' => '#^/api/v2/user#',
-                'base' => '',
-                'sub' => include 'User/urls-v2.php'
-            )
-        ));
+
+        self::$client = new Client();
     }
 
     /**
+     *
      * @afterClass
      */
     public static function removeDatabses()
     {
-        $m = new Pluf_Migration(Pluf::f('installed_apps'));
+        $m = new Pluf_Migration();
         $m->unInstall();
     }
 
     /**
+     *
      * @test
      */
     public function listSystemConfiguration()
     {
         // login
-        $response = self::$client->post('/api/v2/user/login', array(
+        $response = self::$client->post('/user/login', array(
             'login' => 'admin',
             'password' => 'admin'
         ));
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
-        
-        $response = self::$client->get('/api/v2/super-tenant/configurations');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
+        $this->assertResponseStatusCode($response, 200, 'Fail to login');
+
+        $response = self::$client->get('/supertenant/configurations');
+        $this->assertResponseNotNull($response, 'Find result is empty');
+        $this->assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        $this->assertResponsePaginateList($response, 'Find result is not JSON paginated list');
     }
 }

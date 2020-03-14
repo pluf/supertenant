@@ -16,10 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use PHPUnit\Framework\TestCase;
+use function GuzzleHttp\json_decode;
+use Pluf\Test\Client;
+use Pluf\Test\TestCase;
 require_once 'Pluf.php';
 
 /**
+ *
  * @backupGlobals disabled
  * @backupStaticAttributes disabled
  */
@@ -33,17 +36,20 @@ class SuperTenant_REST_TenantTest extends TestCase
     private static $user = null;
 
     /**
+     *
      * @beforeClass
      */
     public static function installApps()
     {
-        $config = include(__DIR__ . '/../conf/config.php');
+        $config = include (__DIR__ . '/../conf/config.php');
         $config['subdomain_min_length'] = 5;
-        $config['reserved_subdomains'] = array('reserved');
+        $config['reserved_subdomains'] = array(
+            'reserved'
+        );
         Pluf::start($config);
-        $m = new Pluf_Migration(Pluf::f('installed_apps'));
+        $m = new Pluf_Migration();
         $m->install();
-        
+
         // Test tenant
         $tenant = new Pluf_Tenant();
         $tenant->domain = 'localhost';
@@ -52,15 +58,13 @@ class SuperTenant_REST_TenantTest extends TestCase
         if (true !== $tenant->create()) {
             throw new Pluf_Exception('Faile to create new tenant');
         }
-        
+
         $m->init($tenant);
         self::$tenant = $tenant;
         
-        if (! isset($GLOBALS['_PX_request'])) {
-            $GLOBALS['_PX_request'] = new Pluf_HTTP_Request('/');
-        }
-        $GLOBALS['_PX_request']->tenant = $tenant;
-        
+        Pluf_HTTP_Request::setCurrent(new Pluf_HTTP_Request('/'));
+        Pluf_Tenant::setCurrent($tenant);
+
         $user = new User_Account();
         $user->login = 'test';
         $user->is_active = true;
@@ -76,33 +80,21 @@ class SuperTenant_REST_TenantTest extends TestCase
         if (true !== $credit->create()) {
             throw new Exception();
         }
-        
+
         $per = User_Role::getFromString('tenant.owner');
         $user->setAssoc($per);
         self::$user = $user;
-        
-        self::$client = new Test_Client(array(
-            array(
-                'app' => 'SuperTenant',
-                'regex' => '#^/api/v2/super-tenant#',
-                'base' => '',
-                'sub' => include 'SuperTenant/urls-v2.php'
-            ),
-            array(
-                'app' => 'User',
-                'regex' => '#^/api/v2/user#',
-                'base' => '',
-                'sub' => include 'User/urls-v2.php'
-            )
-        ));
+
+        self::$client = new Client();
     }
 
     /**
+     *
      * @afterClass
      */
     public static function uninstallApps()
     {
-        $m = new Pluf_Migration(Pluf::f('installed_apps'));
+        $m = new Pluf_Migration();
         $m->unInstall();
     }
 
@@ -113,11 +105,11 @@ class SuperTenant_REST_TenantTest extends TestCase
      */
     public function loginWithTestUser()
     {
-        $response = self::$client->post('/api/v2/user/login', array(
+        $response = self::$client->post('/user/login', array(
             'login' => 'test',
             'password' => 'test'
         ));
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
+        $this->assertResponseStatusCode($response, 200, 'Fail to login');
     }
 
     /**
@@ -127,8 +119,8 @@ class SuperTenant_REST_TenantTest extends TestCase
      */
     public function logoutUser()
     {
-        $response = self::$client->post('/api/v2/user/logout');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
+        $response = self::$client->post('/user/logout');
+        $this->assertResponseStatusCode($response, 200, 'Fail to login');
     }
 
     /**
@@ -143,10 +135,10 @@ class SuperTenant_REST_TenantTest extends TestCase
         // find comments
         $flag = true;
         while ($flag) {
-            $response = self::$client->get('/api/v2/super-tenant/tenants');
-            Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-            Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-            Test_Assert::assertResponsePaginateList($response);
+            $response = self::$client->get('/supertenant/tenants');
+            $this->assertResponseNotNull($response, 'Find result is empty');
+            $this->assertResponseStatusCode($response, 200, 'Find status code is not 200');
+            $this->assertResponsePaginateList($response);
             $this->logoutUser();
             $flag = false;
         }
@@ -167,19 +159,19 @@ class SuperTenant_REST_TenantTest extends TestCase
         $t->subdomain = 'test' . rand() . '.localhost';
         $t->validate = true;
         $t->create();
-        
+
         // find comments
         $flag = true;
         while ($flag) {
-            $response = self::$client->get('/api/v2/super-tenant/tenants');
-            Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-            Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-            Test_Assert::assertResponsePaginateList($response);
-            Test_Assert::assertResponseNonEmptyPaginateList($response);
+            $response = self::$client->get('/supertenant/tenants');
+            $this->assertResponseNotNull($response, 'Find result is empty');
+            $this->assertResponseStatusCode($response, 200, 'Find status code is not 200');
+            $this->assertResponsePaginateList($response);
+            $this->assertResponseNonEmptyPaginateList($response);
             $this->logoutUser();
             $flag = false;
         }
-        
+
         // delete
         $t->delete();
     }
@@ -193,9 +185,9 @@ class SuperTenant_REST_TenantTest extends TestCase
      */
     public function testGetTenant()
     {
-        $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id);
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
+        $response = self::$client->get('/supertenant/tenants/' . self::$tenant->id);
+        $this->assertResponseNotNull($response);
+        $this->assertResponseStatusCode($response, 200);
     }
 
     /**
@@ -207,15 +199,15 @@ class SuperTenant_REST_TenantTest extends TestCase
     {
         $testSubdomain = 'test' . rand();
         // find comments
-        $response = self::$client->post('/api/v2/super-tenant/tenants', array(
+        $response = self::$client->post('/supertenant/tenants', array(
             'title' => 'test',
             'description' => 'test',
             'domain' => $testSubdomain . '.local',
             'subdomain' => $testSubdomain
         ));
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponseNotAnonymousModel($response);
-        
+        $this->assertResponseStatusCode($response, 200);
+        $this->assertResponseNotAnonymousModel($response);
+
         $tenant = Pluf_Tenant::bySubDomain($testSubdomain);
         $tenant->delete();
     }
@@ -230,7 +222,7 @@ class SuperTenant_REST_TenantTest extends TestCase
     {
         $testSubdomain = 'abc';
         // new tenant with too short subdomain
-        $response = self::$client->post('/api/v2/super-tenant/tenants', array(
+        $response = self::$client->post('/supertenant/tenants', array(
             'title' => 'test',
             'description' => 'test',
             'domain' => $testSubdomain . '.local',
@@ -239,7 +231,7 @@ class SuperTenant_REST_TenantTest extends TestCase
         $this->assertNotNull($response);
         $this->assertEquals($response->status_code, 200);
     }
-    
+
     /**
      * Creating tenant
      * Owner could create tenant with reserved subdomain
@@ -250,7 +242,7 @@ class SuperTenant_REST_TenantTest extends TestCase
     {
         $testSubdomain = 'reserved';
         // new tenant with reserved subdomain
-        $response = self::$client->post('/api/v2/super-tenant/tenants', array(
+        $response = self::$client->post('/supertenant/tenants', array(
             'title' => 'test',
             'description' => 'test',
             'domain' => $testSubdomain . '.local',
@@ -259,7 +251,7 @@ class SuperTenant_REST_TenantTest extends TestCase
         $this->assertNotNull($response);
         $this->assertEquals($response->status_code, 200);
     }
-    
+
     /**
      * Getting tenant ticket
      *
@@ -267,10 +259,10 @@ class SuperTenant_REST_TenantTest extends TestCase
      */
     public function testGetTenantTickets()
     {
-        $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/tickets');
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponsePaginateList($response);
+        $response = self::$client->get('/supertenant/tenants/' . self::$tenant->id . '/tickets');
+        $this->assertResponseNotNull($response);
+        $this->assertResponseStatusCode($response, 200);
+        $this->assertResponsePaginateList($response);
     }
 
     /**
@@ -280,24 +272,24 @@ class SuperTenant_REST_TenantTest extends TestCase
      */
     public function testCreateTenantTickets()
     {
-        $response = self::$client->post('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/tickets', array(
+        $response = self::$client->post('/supertenant/tenants/' . self::$tenant->id . '/tickets', array(
             'type' => 'bug',
             'subject' => 'test ticket',
             'description' => 'it is not possible to test'
         ));
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponseNotAnonymousModel($response);
+        $this->assertResponseNotNull($response);
+        $this->assertResponseStatusCode($response, 200);
+        $this->assertResponseNotAnonymousModel($response);
         $t = json_decode($response->content, true);
-        
-        $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/tickets');
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseNonEmptyPaginateList($response);
-        
+
+        $response = self::$client->get('/supertenant/tenants/' . self::$tenant->id . '/tickets');
+        $this->assertResponseNotNull($response);
+        $this->assertResponseStatusCode($response, 200);
+        $this->assertResponsePaginateList($response);
+        $this->assertResponseNonEmptyPaginateList($response);
+
         $obj = new SuperTenant_Ticket($t['id']);
-        Test_Assert::assertFalse($obj->isAnonymous());
+        $this->assertFalse($obj->isAnonymous());
         $obj->delete();
     }
 
@@ -308,10 +300,10 @@ class SuperTenant_REST_TenantTest extends TestCase
      */
     public function testGetTenantiInvoice()
     {
-        $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/invoices');
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponsePaginateList($response);
+        $response = self::$client->get('/supertenant/tenants/' . self::$tenant->id . '/invoices');
+        $this->assertResponseNotNull($response);
+        $this->assertResponseStatusCode($response, 200);
+        $this->assertResponsePaginateList($response);
     }
 
     /**
@@ -321,25 +313,25 @@ class SuperTenant_REST_TenantTest extends TestCase
      */
     public function testCreateTenantInvoce()
     {
-        $response = self::$client->post('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/invoices', array(
+        $response = self::$client->post('/supertenant/tenants/' . self::$tenant->id . '/invoices', array(
             'amount' => 1000,
             'title' => 'test ticket',
             'description' => 'it is not possible to test',
             'due_dtime' => gmdate('Y-m-d H:i:s')
         ));
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponseNotAnonymousModel($response);
+        $this->assertResponseNotNull($response);
+        $this->assertResponseStatusCode($response, 200);
+        $this->assertResponseNotAnonymousModel($response);
         $t = json_decode($response->content, true);
-        
-        $response = self::$client->get('/api/v2/super-tenant/tenants/' . self::$tenant->id . '/invoices');
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseNonEmptyPaginateList($response);
-        
+
+        $response = self::$client->get('/supertenant/tenants/' . self::$tenant->id . '/invoices');
+        $this->assertResponseNotNull($response);
+        $this->assertResponseStatusCode($response, 200);
+        $this->assertResponsePaginateList($response);
+        $this->assertResponseNonEmptyPaginateList($response);
+
         $obj = new SuperTenant_Invoice($t['id']);
-        Test_Assert::assertFalse($obj->isAnonymous());
+        $this->assertFalse($obj->isAnonymous());
         $obj->delete();
     }
 }

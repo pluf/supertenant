@@ -16,26 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-use PHPUnit\Framework\TestCase;
+use Pluf\Test\Client;
+use Pluf\Test\TestCase;
 require_once 'Pluf.php';
 
 /**
+ *
  * @backupGlobals disabled
  * @backupStaticAttributes disabled
  */
 class Invoices_REST_SelfTest extends TestCase
 {
+
     private static $client = null;
 
     /**
+     *
      * @beforeClass
      */
     public static function installApps()
     {
         Pluf::start(__DIR__ . '/../conf/config.php');
-        $m = new Pluf_Migration(Pluf::f('installed_apps'));
+        $m = new Pluf_Migration();
         $m->install();
-        
+
         // Main tenant
         $view = new SuperTenant_Views();
         $request = new Pluf_HTTP_Request('/');
@@ -48,35 +52,21 @@ class Invoices_REST_SelfTest extends TestCase
             'validate' => true
         );
         $view->create($request, array());
-        
-        self::$client = new Test_Client(array(
-            array(
-                'app' => 'SuperTenant',
-                'regex' => '#^/api/v2/super-tenant#',
-                'base' => '',
-                'sub' => include 'SuperTenant/urls-v2.php'
-            ),
-            array(
-                'app' => 'User',
-                'regex' => '#^/api/v2/user#',
-                'base' => '',
-                'sub' => include 'User/urls-v2.php'
-            )
-        ));
-        // login
-        $response = self::$client->post('/api/v2/user/login', array(
+
+        self::$client = new Client();
+        self::$client->post('/user/login', array(
             'login' => 'admin',
             'password' => 'admin'
         ));
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
     }
 
     /**
+     *
      * @afterClass
      */
     public static function uninstallApps()
     {
-        $m = new Pluf_Migration(Pluf::f('installed_apps'));
+        $m = new Pluf_Migration();
         $m->unInstall();
     }
 
@@ -88,15 +78,15 @@ class Invoices_REST_SelfTest extends TestCase
     public function testFindInvoices()
     {
         // Current user is valid
-        $response = self::$client->get('/api/v2/user/accounts/current');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
-        Test_Assert::assertResponseNotAnonymousModel($response, 'Current user is anonymous');
-        
+        $response = self::$client->get('/user/accounts/current');
+        $this->assertResponseStatusCode($response, 200, 'Fail to login');
+        $this->assertResponseNotAnonymousModel($response, 'Current user is anonymous');
+
         // find
-        $response = self::$client->get('/api/v2/super-tenant/invoices');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
+        $response = self::$client->get('/supertenant/invoices');
+        $this->assertResponseNotNull($response, 'Find result is empty');
+        $this->assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        $this->assertResponsePaginateList($response, 'Find result is not JSON paginated list');
     }
 
     /**
@@ -109,24 +99,24 @@ class Invoices_REST_SelfTest extends TestCase
     public function testFindInvoicesNonEmpty()
     {
         // Current user is valid
-        $response = self::$client->get('/api/v2/user/accounts/current');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
-        Test_Assert::assertResponseNotAnonymousModel($response, 'Current user is anonymous');
-        
+        $response = self::$client->get('/user/accounts/current');
+        $this->assertResponseStatusCode($response, 200, 'Fail to login');
+        $this->assertResponseNotAnonymousModel($response, 'Current user is anonymous');
+
         $i = new Tenant_Invoice();
         $i->title = 'test';
         $i->descscription = 'test';
         $i->amount = 1000;
         $i->due_dtime = gmdate('Y-m-d H:i:s');
         $i->create();
-        
+
         // find
-        $response = self::$client->get('/api/v2/super-tenant/invoices');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
-        Test_Assert::assertResponseNonEmptyPaginateList($response, 'No object is in list');
-        
+        $response = self::$client->get('/supertenant/invoices');
+        $this->assertResponseNotNull($response, 'Find result is empty');
+        $this->assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        $this->assertResponsePaginateList($response, 'Find result is not JSON paginated list');
+        $this->assertResponseNonEmptyPaginateList($response, 'No object is in list');
+
         // delete
         $i->delete();
     }
@@ -139,23 +129,23 @@ class Invoices_REST_SelfTest extends TestCase
     public function testGetInvoice()
     {
         // Current user is valid
-        $response = self::$client->get('/api/v2/user/accounts/current');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
-        Test_Assert::assertResponseNotAnonymousModel($response, 'Current user is anonymous');
-        
+        $response = self::$client->get('/user/accounts/current');
+        $this->assertResponseStatusCode($response, 200, 'Fail to login');
+        $this->assertResponseNotAnonymousModel($response, 'Current user is anonymous');
+
         $i = new Tenant_Invoice();
         $i->title = 'test';
         $i->descscription = 'test';
         $i->amount = 1000;
         $i->due_dtime = gmdate('Y-m-d H:i:s');
         $i->create();
-        
+
         // find
-        $response = self::$client->get('/api/v2/super-tenant/invoices/' . $i->id);
-        Test_Assert::assertResponseNotNull($response);
-        Test_Assert::assertResponseStatusCode($response, 200);
-        Test_Assert::assertResponseNotAnonymousModel($response, 'Invoice not foudn');
-        
+        $response = self::$client->get('/supertenant/invoices/' . $i->id);
+        $this->assertResponseNotNull($response);
+        $this->assertResponseStatusCode($response, 200);
+        $this->assertResponseNotAnonymousModel($response, 'Invoice not foudn');
+
         // delete
         $i->delete();
     }

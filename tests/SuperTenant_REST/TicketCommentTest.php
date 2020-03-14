@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+use Pluf\Test\Client;
+
 require_once 'Pluf.php';
 
 set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . '/../Base/');
@@ -38,26 +40,13 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
     {
         parent::installApps();
         // Owner client
-        self::$ownerClient = new Test_Client(array(
-            array(
-                'app' => 'SuperTenant',
-                'regex' => '#^/api/v2/super-tenant#',
-                'base' => '',
-                'sub' => include 'SuperTenant/urls-v2.php'
-            ),
-            array(
-                'app' => 'User',
-                'regex' => '#^/api/v2/user#',
-                'base' => '',
-                'sub' => include 'User/urls-v2.php'
-            )
-        ));
+        self::$ownerClient = new Client();
         // login
-        $response = self::$ownerClient->post('/api/v2/user/login', array(
+        $response = self::$ownerClient->post('/user/login', array(
             'login' => 'test',
             'password' => 'test'
         ));
-        Test_Assert::assertResponseStatusCode($response, 200, 'Fail to login');
+        self::assertResponseStatusCode($response, 200, 'Fail to login');
     }
 
     /**
@@ -81,10 +70,10 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $t->requester_id = $user;
         $t->create();
 
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response, 'Find result is not JSON paginated list');
+        $response = self::$ownerClient->get('/supertenant/tickets/' . $t->id . '/comments');
+        $this->assertResponseNotNull($response, 'Find result is empty');
+        $this->assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        $this->assertResponsePaginateList($response, 'Find result is not JSON paginated list');
 
         // delete
         $t->delete();
@@ -116,11 +105,11 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $c->ticket_id = $t;
         $c->create();
 
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseNonEmptyPaginateList($response);
+        $response = self::$ownerClient->get('/supertenant/tickets/' . $t->id . '/comments');
+        $this->assertResponseNotNull($response, 'Find result is empty');
+        $this->assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        $this->assertResponsePaginateList($response);
+        $this->assertResponseNonEmptyPaginateList($response);
 
         // delete
         $c->delete();
@@ -153,11 +142,11 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $c->ticket_id = $t;
         $c->create();
 
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments/' . $c->id);
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponseAsModel($response);
-        Test_Assert::assertResponseNotAnonymousModel($response);
+        $response = self::$ownerClient->get('/supertenant/tickets/' . $t->id . '/comments/' . $c->id);
+        $this->assertResponseNotNull($response, 'Find result is empty');
+        $this->assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        $this->assertResponseAsModel($response);
+        $this->assertResponseNotAnonymousModel($response);
 
         // delete
         $c->delete();
@@ -183,19 +172,19 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $t->requester_id = $user;
         $t->create();
 
-        $response = self::$ownerClient->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments', array(
+        $response = self::$ownerClient->post('/supertenant/tickets/' . $t->id . '/comments', array(
             'title' => 'test',
             'description' => 'test'
         ));
-        Test_Assert::assertResponseStatusCode($response, 200);
+        $this->assertResponseStatusCode($response, 200);
         $tc = json_decode($response->content, true);
 
         // find comments
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseNonEmptyPaginateList($response);
+        $response = self::$ownerClient->get('/supertenant/tickets/' . $t->id . '/comments');
+        $this->assertResponseNotNull($response, 'Find result is empty');
+        $this->assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        $this->assertResponsePaginateList($response);
+        $this->assertResponseNonEmptyPaginateList($response);
 
         // delete
         $c = new Tenant_Comment($tc['id']);
@@ -223,26 +212,26 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $t->create();
 
         // Create
-        $response = self::$ownerClient->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments', array(
+        $response = self::$ownerClient->post('/supertenant/tickets/' . $t->id . '/comments', array(
             'title' => 'test',
             'description' => 'test'
         ));
-        Test_Assert::assertResponseStatusCode($response, 200);
+        $this->assertResponseStatusCode($response, 200);
         $tc = json_decode($response->content, true);
 
         // update
-        $response = self::$ownerClient->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments/' . $tc['id'], array(
+        $response = self::$ownerClient->post('/supertenant/tickets/' . $t->id . '/comments/' . $tc['id'], array(
             'title' => 'test new title',
             'description' => 'test'
         ));
-        Test_Assert::assertResponseStatusCode($response, 200);
+        $this->assertResponseStatusCode($response, 200);
 
         // find comments
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseNonEmptyPaginateList($response);
+        $response = self::$ownerClient->get('/supertenant/tickets/' . $t->id . '/comments');
+        $this->assertResponseNotNull($response, 'Find result is empty');
+        $this->assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        $this->assertResponsePaginateList($response);
+        $this->assertResponseNonEmptyPaginateList($response);
 
         // delete
         $c = new Tenant_Comment($tc['id']);
@@ -270,23 +259,23 @@ class SuperTenant_REST_TicketCommentsTest extends AbstractBasicTest
         $t->create();
 
         // create
-        $response = self::$ownerClient->post('/api/v2/super-tenant/tickets/' . $t->id . '/comments', array(
+        $response = self::$ownerClient->post('/supertenant/tickets/' . $t->id . '/comments', array(
             'title' => 'test',
             'description' => 'test'
         ));
-        Test_Assert::assertResponseStatusCode($response, 200);
-        
+        $this->assertResponseStatusCode($response, 200);
+
         $tc = json_decode($response->content, true);
         // delete
-        $response = self::$ownerClient->delete('/api/v2/super-tenant/tickets/' . $t->id . '/comments/' . $tc['id']);
-        Test_Assert::assertResponseStatusCode($response, 200);
+        $response = self::$ownerClient->delete('/supertenant/tickets/' . $t->id . '/comments/' . $tc['id']);
+        $this->assertResponseStatusCode($response, 200);
 
-        // 
-        $response = self::$ownerClient->get('/api/v2/super-tenant/tickets/' . $t->id . '/comments');
-        Test_Assert::assertResponseNotNull($response, 'Find result is empty');
-        Test_Assert::assertResponseStatusCode($response, 200, 'Find status code is not 200');
-        Test_Assert::assertResponsePaginateList($response);
-        Test_Assert::assertResponseEmptyPaginateList($response);
+        //
+        $response = self::$ownerClient->get('/supertenant/tickets/' . $t->id . '/comments');
+        $this->assertResponseNotNull($response, 'Find result is empty');
+        $this->assertResponseStatusCode($response, 200, 'Find status code is not 200');
+        $this->assertResponsePaginateList($response);
+        $this->assertResponseEmptyPaginateList($response);
 
         // delete
         $t->delete();

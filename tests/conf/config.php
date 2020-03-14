@@ -11,8 +11,6 @@ $cfg['debug'] = true;
 $cfg['installed_apps'] = array(
     'Pluf',
     'User',
-    'Role',
-    'Group',
     'Monitor',
     'Tenant',
     'SuperTenant'
@@ -41,8 +39,8 @@ $cfg['secret_key'] = '5a8d7e0f2aad8bdab8f6eef725412850';
 // cached data and other temporary resources.
 // It must be writeable by your webserver instance.
 // It is mandatory if you are using the template system.
-$cfg['tmp_folder'] = __DIR__ . '/../tmp';
-$cfg['upload_path'] = __DIR__ . '/../storage/tenant';
+$cfg['tmp_folder'] = '/tmp';
+$cfg['upload_path'] = '/tmp';
 
 // The folder in which the templates of the application are located.
 $cfg['templates_folder'] = array(
