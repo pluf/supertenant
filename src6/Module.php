@@ -1,7 +1,7 @@
 <?php
 /*
  * This file is part of Pluf Framework, a simple PHP Application Framework.
- * Copyright (C) 2010-2020 Phoinex Scholars Co. (http://dpq.co.ir)
+ * Copyright (C) 2010-2020 Phoinex Scholars Co. http://dpq.co.ir
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
- Pluf_Signal::connect('Pluf_Dispatcher::postDispatch',
-    array(
-        'SuperTenant_ConfigService',
-        'flush'
-    ), 'Pluf_Dispatcher');
-    
-return array(
-);
+namespace Pluf\SuperTenant;
+
+use Pluf;
+use Pluf_Signal;
+
+class Module extends \Pluf\Module
+{
+
+    const moduleJsonPath = __DIR__ . '/module.json';
+
+    const relations = array();
+
+    public function init(Pluf $bootstrap): void
+    {
+        Pluf_Signal::connect('Pluf_Dispatcher::postDispatch', array(
+            'SuperTenant_ConfigService',
+            'flush'
+        ), 'Pluf_Dispatcher');
+    }
+}
+
