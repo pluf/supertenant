@@ -1,2 +1,0 @@
-<?php class Pluf_Template_8999b8c12c0cf6be21993a859ffbed43 {
-public static function render($c) {$t = $c; ?><?php $_extra_tag = Pluf::factory('SuperTenant_Template_Tag', $t); $_extra_tag->start('config2'); ?><?php } } 

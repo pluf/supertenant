@@ -45,7 +45,7 @@ abstract class AbstractBasicTest extends TestCase
         $tenant->subdomain = 'www';
         $tenant->validate = true;
         if (true !== $tenant->create()) {
-            throw new Pluf_Exception('Faile to create new tenant');
+            throw new  \Pluf\Exception('Faile to create new tenant');
         }
 
         $m->init($tenant);

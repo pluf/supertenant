@@ -16,20 +16,12 @@ $cfg['installed_apps'] = array(
     'SuperTenant'
 );
 
-$cfg['multitenant'] = true;
-
 /*
  * Middlewares
  */
 $cfg['middleware_classes'] = array(
-    // find tenant
-    'Pluf_Middleware_TenantEmpty',
-    'Pluf_Middleware_TenantFromHeader',
-    'Pluf_Middleware_TenantFromDomain',
-    'Pluf_Middleware_TenantFromSubDomain', // It should be used only in multitenant state
-    'Pluf_Middleware_TenantFromConfig',
-    // Sessions
-    'Pluf_Middleware_Session',
+    '\Pluf\Middleware\Tenant',
+    '\Pluf\Middleware\Session',
     'User_Middleware_Session'
 );
 
@@ -59,6 +51,21 @@ $cfg['template_tags'] = array(
 // Default mimetype of the document your application is sending.
 // It can be overwritten for a given response if needed.
 $cfg['mimetype'] = 'text/html';
+
+
+/***********************************************************************
+ * Tenant
+ **********************************************************************/
+$cfg['multitenant'] = true;
+$cfg['tenant_default'] = 'main';
+$cfg['tenant_notfound_url'] = 'https://pluf.ir';
+    
+    
+/***********************************************************************
+ * Supper Tenant
+ **********************************************************************/
+
+
 
 return $cfg;
 
