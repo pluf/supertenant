@@ -47,8 +47,8 @@ class Invoices_REST_SelfTest extends TestCase
         $request->REQUEST = array(
             'title' => 'Main tenant',
             'description' => 'Description of the main tenant',
-            'domain' => 'pluf.ir',
-            'subdomain' => 'www',
+            'domain' => 'localhost',
+            'subdomain' => 'localhost',
             'validate' => true
         );
         $view->create($request, array());

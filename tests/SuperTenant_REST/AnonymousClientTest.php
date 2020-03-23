@@ -55,7 +55,7 @@ class SuperTenant_REST_AnonymousClientTest extends TestCase
         $tenant->subdomain = 'testtenant';
         $tenant->validate = true;
         if (true !== $tenant->create()) {
-            throw new Pluf_Exception('Faile to create new tenant');
+            throw new \Pluf\Exception('Faile to create new tenant');
         }
 
         $m->init($tenant);

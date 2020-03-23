@@ -54,8 +54,8 @@ class Invoices_REST_OtherTest extends TestCase
         $request->REQUEST = array(
             'title' => 'Customer tenant',
             'description' => 'Description of the customer tenant',
-            'domain' => 'customer.pluf.ir',
-            'subdomain' => 'customer',
+            'domain' => 'localhost',
+            'subdomain' => 'localhost',
             'validate' => true
         );
         $view->create($request, array());
