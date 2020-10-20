@@ -1,6 +1,6 @@
 {
 	"name" : "pluf/supertenant",
-	"version" : "6.0.18",
+	"version" : "6.0.19",
 	"description" : "Tenant management module",
 	"type" : "library",
 	"license" : "MIT",
